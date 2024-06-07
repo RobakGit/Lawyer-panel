@@ -9,16 +9,43 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.16",
+    "@mui/material": "^5.15.16",
+    "@mui/x-data-grid": "^7.3.2",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^5.13.0",
+    "axios": "^1.6.8",
+    "bcrypt": "^5.1.1",
+    "draft-convert": "^2.1.13",
+    "draft-js": "^0.11.7",
+    "draft-js-export-html": "^1.4.1",
+    "draft-js-import-html": "^1.4.1",
+    "formidable": "^3.5.1",
+    "http-status-codes": "^2.3.0",
+    "isomorphic-dompurify": "^2.9.0",
+    "next": "14.2.3",
+    "next-auth": "^4.24.7",
+    "nodemailer": "^6.9.13",
+    "prisma": "^5.13.0",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.3"
+    "react-dropzone": "^14.2.3",
+    "react-spinners": "^0.13.8",
+    "uniqolor": "^1.1.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/bcrypt": "^5.0.2",
+    "@types/draft-convert": "^2.1.8",
+    "@types/draft-js": "^0.11.18",
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
     "eslint": "^8",
-    "eslint-config-next": "14.2.3"
+    "eslint-config-next": "14.2.3",
+    "typescript": "^5"
   }
 }

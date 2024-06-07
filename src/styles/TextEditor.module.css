@@ -1,0 +1,30 @@
+.editorContainer {
+  border: 1px solid #ccc;
+  padding: 1rem;
+}
+
+.toolsContainer {
+  display: flex;
+  justify-content: left;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.functionButton {
+  background-color: #ccc;
+  color: #fff;
+  border: 1px solid #aaa;
+  padding: 0.3rem;
+  cursor: pointer;
+}
+
+.separator {
+  margin: 0 10px;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  .editorContainer {
+    background-color: var(--dark-background);
+    color: #fff;
+  }
+} */

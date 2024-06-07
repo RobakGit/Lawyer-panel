@@ -1,0 +1,27 @@
+.fileCard {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  border-radius: 0.2rem;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.fileCard:hover {
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.fileCard img {
+  width: 50%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.moreIcon {
+  position: absolute;
+  cursor: pointer;
+  top: 0.5rem;
+  right: 0.5rem;
+}

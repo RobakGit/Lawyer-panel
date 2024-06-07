@@ -1,0 +1,13 @@
+.activityContainer {
+  height: 80vh;
+  overflow-y: auto;
+  margin-top: 20px;
+}
+
+.activityCard {
+  padding: 0.8rem;
+  margin: 1rem;
+  width: "100%";
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+}
