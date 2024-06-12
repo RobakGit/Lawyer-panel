@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { ServerSessionI } from "@/types/next-auth";
 import Nextauth from "@/pages/api/auth/[...nextauth]";
 import * as fsPromises from "node:fs/promises";
+import { FileStatus } from "@prisma/client";
 
 export const config = {
   api: {
@@ -13,10 +14,10 @@ export const config = {
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession<ServerSessionI>(req, res, Nextauth);
+  if (!session || !session.user?.email) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   if (req.method === "GET") {
-    if (!session || !session.user?.email) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
     const fileUid = req.query.file as string;
     const file = await prisma.file.findUnique({
       where: {
@@ -29,6 +30,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader("Content-Type", "application/octet-stream");
     res.setHeader("Content-Disposition", `attachment; filename=${file.name}`);
     res.end(fileData);
+  } else if (req.method === "DELETE") {
+    const fileUid = req.query.file as string;
+    const file = await prisma.file.update({
+      where: { uid: fileUid },
+      data: { status: FileStatus.deleted },
+      select: { uid: true, status: true },
+    });
+    res.json({ file });
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }

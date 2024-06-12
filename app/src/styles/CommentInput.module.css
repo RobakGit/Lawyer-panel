@@ -30,13 +30,13 @@
 }
 
 .button {
-  width: calc(20% - 1rem);
-  padding: 1.15rem;
+  width: calc(20% - 1rem) !important;
+  padding: 1.15rem !important;
   border: none;
   border-radius: 0 0.5rem 0.5rem 0;
   color: #fff;
   cursor: pointer;
-  position: absolute;
+  position: absolute !important;
   right: 0;
   top: 0;
 }

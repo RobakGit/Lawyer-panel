@@ -6,12 +6,13 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import styles from "@/styles/Home.module.css";
 import { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import NotificationCard from "@/components/cards/NotificationCard";
 import axios from "axios";
 import { CaseBackendType, UserType } from "@/types/case";
 import NewCard from "@/components/cards/CaseCard/NewCard";
 import DOMPurify from "isomorphic-dompurify";
+import HomeDataGrid from "@/components/dataGrids/HomeDataGrid/HomeDataGrid";
+import { CaseStatus } from "@prisma/client";
 
 export default function Home() {
   const [cases, setCases] = useState<CaseBackendType[]>([]);
@@ -54,16 +55,6 @@ export default function Home() {
   ];
   const [listType, setListType] = useState<"list" | "grid">("grid");
 
-  const columns = [
-    { field: "date", headerName: "Data", width: 150 },
-    { field: "title", headerName: "Tytuł", width: 150 },
-    { field: "destination", headerName: "Miejsce", width: 150 },
-    { field: "description", headerName: "Opis", width: 150 },
-    { field: "status", headerName: "Status", width: 150 },
-    { field: "cooperators", headerName: "Współpracownicy", width: 150 },
-    { field: "nextEvent", headerName: "Następne wydarzenie", width: 150 },
-  ];
-
   const createNewCase = () => {
     axios.post("/api/case").then((response) => {
       window.location.href = `/case/${response.data.uid}`;
@@ -77,6 +68,26 @@ export default function Home() {
       })
         .replace(/\n/g, " ")
         .slice(0, 100) + "..."
+    );
+  };
+
+  const changeStatus = async (uid: string, newStatus: CaseStatus) => {
+    await axios.put(`/api/case/${uid}`, { status: newStatus });
+    setCases(
+      cases.map((caseItem) =>
+        caseItem.uid === uid ? { ...caseItem, status: newStatus } : caseItem
+      )
+    );
+  };
+
+  const changeUsers = async (uid: string, user: UserType) => {
+    const response = await axios.put(`/api/case/${uid}`, { cooperator: user });
+    setCases(
+      cases.map((caseItem) =>
+        caseItem.uid === uid
+          ? { ...caseItem, users: response.data.users }
+          : caseItem
+      )
     );
   };
 
@@ -143,21 +154,20 @@ export default function Home() {
                       status={caseItem.status}
                       cooperators={caseItem.users}
                       allUsers={allUsers}
+                      onStatusChange={changeStatus}
+                      onUserClick={changeUsers}
                       nextEvent={undefined}
                     />
                   </Grid>
                 ))}
               </>
             ) : (
-              <DataGrid
-                rows={cases.map((caseItem, index) => {
-                  return {
-                    ...caseItem,
-                    description: clearHTMLTagsAndLimit(caseItem.description),
-                    id: index,
-                  };
-                })}
-                columns={columns}
+              <HomeDataGrid
+                cases={cases}
+                clearHTMLTagsAndLimit={clearHTMLTagsAndLimit}
+                allUsers={allUsers}
+                onStatusChange={changeStatus}
+                onUserClick={changeUsers}
               />
             )}
           </Grid>

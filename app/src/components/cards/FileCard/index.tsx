@@ -5,6 +5,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useState } from "react";
 import SelectMenuList from "@/components/inputs/SelectMenuList";
+import { DeleteForever } from "@mui/icons-material";
 
 const selectMenuList = [
   {
@@ -15,16 +16,27 @@ const selectMenuList = [
     element: { text: "Pobierz", icon: <DownloadIcon fontSize="small" /> },
     actionName: "download",
   },
+  {
+    element: {
+      text: "Usuń",
+      icon: <DeleteForever fontSize="small" />,
+      sx: { background: "#ff00003f", "&:hover": { background: "#ff0000af" } },
+    },
+    actionName: "delete",
+  },
 ];
+
+const filenameLimit = 30;
 
 export default function FileCard(
   props: Readonly<{
     uid: string;
     filename: string;
-    onDownload?: (uid: string) => void;
+    onDownload: (uid: string) => void;
+    onDelete: (uid: string) => void;
   }>
 ) {
-  const { uid, filename, onDownload } = props;
+  const { uid, filename, onDownload, onDelete } = props;
   const fileExtension = filename.split(".").pop();
   const [moreIconRef, setMoreIconRef] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(moreIconRef);
@@ -56,7 +68,11 @@ export default function FileCard(
       console.log("viewing file");
     }
     if (action === "download") {
-      onDownload && onDownload(uid);
+      onDownload(uid);
+    }
+    if (action === "delete") {
+      console.log("deleting file");
+      onDelete(uid);
     }
     return;
   };
@@ -83,7 +99,11 @@ export default function FileCard(
         alt={getFileIconData(fileExtension).alt}
         className={styles.fileImage}
       />
-      <span className={styles.filename}>{filename}</span>
+      <span className={styles.filename}>
+        {filename.length - (fileExtension?.length ?? 0) < filenameLimit
+          ? filename
+          : `${filename.slice(0, filenameLimit)}...${fileExtension}`}
+      </span>
     </div>
   );
 }

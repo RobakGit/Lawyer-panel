@@ -86,6 +86,15 @@ export default function CaseContainer() {
     window.URL.revokeObjectURL(url);
   };
 
+  const deleteFile = async (uid: string) => {
+    const response = await axios.delete(
+      `/api/case/${caseId.current}/file/${uid}`
+    );
+    if (response.status === 200) {
+      setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== uid));
+    }
+  };
+
   return (
     <Grid container>
       <Grid
@@ -142,6 +151,7 @@ export default function CaseContainer() {
             files={files}
             uploadFiles={uploadFiles}
             onDownload={downloadFile}
+            onDelete={deleteFile}
           />
         </Grid>
       </Grid>

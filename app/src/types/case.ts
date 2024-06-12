@@ -1,4 +1,4 @@
-import { CaseStatus } from "@prisma/client";
+import { CaseStatus, FileStatus } from "@prisma/client";
 
 export type UserType = {
   uid: string;
@@ -57,6 +57,7 @@ export const CaseBackendPrismaSelect = {
     },
   },
   files: {
+    where: { status: FileStatus.active },
     select: {
       uid: true,
       name: true,
