@@ -152,14 +152,15 @@ model Comment {
 }
 
 model File {
-  id         Int      @id @default(autoincrement())
-  uid        String   @unique @default(uuid()) @db.Uuid
+  id         Int        @id @default(autoincrement())
+  uid        String     @unique @default(uuid()) @db.Uuid
   name       String
   path       String
-  caseId     Int      @map("case_id")
-  uploadedBy Int      @map("uploaded_by")
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  caseId     Int        @map("case_id")
+  uploadedBy Int        @map("uploaded_by")
+  status     FileStatus @default(active)
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   case Case @relation(fields: [caseId], references: [id])
   user User @relation(fields: [uploadedBy], references: [id])
@@ -188,4 +189,9 @@ enum CaseStatus {
 enum AccessStatus {
   active
   inactive
+}
+
+enum FileStatus {
+  active
+  deleted
 }

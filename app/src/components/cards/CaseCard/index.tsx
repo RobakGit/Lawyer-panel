@@ -7,6 +7,7 @@ import DOMPurify from "isomorphic-dompurify";
 import axios from "axios";
 import { useState } from "react";
 import CooperatorsSelector from "@/components/inputs/CooperatorsSelector";
+import { CaseStatus } from "@prisma/client";
 
 export default function CaseCard(
   props: Readonly<{
@@ -18,6 +19,8 @@ export default function CaseCard(
     status: string;
     cooperators: UserType[];
     allUsers: UserType[];
+    onStatusChange: (uid: string, newStatus: CaseStatus) => void;
+    onUserClick: (uid: string, user: UserType) => void;
     nextEvent?: string;
   }>
 ) {
@@ -30,21 +33,10 @@ export default function CaseCard(
     status,
     cooperators,
     allUsers,
+    onStatusChange,
+    onUserClick,
     nextEvent,
   } = props;
-  const [statusValue, setStatusValue] = useState(status);
-  const [cooperatorsValue, setCooperatorsValue] = useState(cooperators);
-
-  const onStatusChange = async (newStatus: string) => {
-    if (newStatus === statusValue) return;
-    setStatusValue(newStatus);
-    await axios.put(`/api/case/${uid}`, { status: newStatus });
-  };
-
-  const onUserClick = async (user: UserType) => {
-    const response = await axios.put(`/api/case/${uid}`, { cooperator: user });
-    setCooperatorsValue(response.data.users);
-  };
 
   return (
     <div
@@ -66,16 +58,16 @@ export default function CaseCard(
       <div className={styles.description}>{description}</div>
       <div className={styles.status}>
         <StatusSelector
-          statusValue={statusValue}
-          onStatusChange={(status) => onStatusChange(status)}
+          statusValue={status}
+          onStatusChange={(status) => onStatusChange(uid, status)}
         />
       </div>
       <div className={styles.footerSection}>
         <div className={styles.cooperators}>
           <CooperatorsSelector
-            cooperators={cooperatorsValue}
+            cooperators={cooperators}
             allUsers={allUsers}
-            onUserClick={onUserClick}
+            onUserClick={(user) => onUserClick(uid, user)}
           />
         </div>
         <div className={styles.event}>{nextEvent}</div>

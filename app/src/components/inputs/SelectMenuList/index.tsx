@@ -1,4 +1,10 @@
-import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
+import {
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  SxProps,
+} from "@mui/material";
 import { ReactElement } from "react";
 
 export default function SelectMenuList(
@@ -11,6 +17,7 @@ export default function SelectMenuList(
       text: string;
       icon?: ReactElement;
       isActive?: boolean;
+      sx?: SxProps;
     }>;
   }>
 ) {
@@ -27,7 +34,10 @@ export default function SelectMenuList(
         <MenuItem
           key={element.text}
           onClick={(e) => onMenuItemClick(e, index)}
-          sx={{ backgroundColor: element.isActive ? "#eee" : undefined }}
+          sx={{
+            ...element.sx,
+            ...(element.isActive && { backgroundColor: "#eee" }),
+          }}
         >
           {element.icon && <ListItemIcon>{element.icon}</ListItemIcon>}
           <ListItemText>{element.text}</ListItemText>

@@ -1,10 +1,11 @@
 import styles from "@/styles/StatusSelector.module.css";
 import { useRef, useState } from "react";
 import SelectMenuList from "../SelectMenuList";
+import { CaseStatus } from "@prisma/client";
 
 export default function StatusSelector(props: {
   statusValue: string;
-  onStatusChange: (newStatus: string) => void;
+  onStatusChange: (newStatus: CaseStatus) => void;
 }) {
   const { statusValue, onStatusChange } = props;
   const statusRef = useRef(null);
@@ -17,7 +18,7 @@ export default function StatusSelector(props: {
   ];
 
   const onSelect = (index: number) => {
-    onStatusChange(statuses[index].enum);
+    onStatusChange(statuses[index].enum as CaseStatus);
   };
 
   const onClick = (

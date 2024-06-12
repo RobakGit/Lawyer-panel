@@ -9,9 +9,10 @@ export default function FilesPanelWithUploader(
     files: FileType[];
     uploadFiles: (files: File[]) => void;
     onDownload?: (uid: string) => void;
+    onDelete?: (uid: string) => void;
   }>
 ) {
-  const { files, uploadFiles, onDownload } = props;
+  const { files, uploadFiles, onDownload, onDelete } = props;
 
   const onDrop = (acceptedFiles: File[]) => {
     uploadFiles(acceptedFiles);
@@ -23,6 +24,11 @@ export default function FilesPanelWithUploader(
 
   const download = (uid: string) => {
     onDownload && onDownload(uid);
+    return;
+  };
+
+  const deleteFile = (uid: string) => {
+    onDelete && onDelete(uid);
     return;
   };
 
@@ -44,6 +50,7 @@ export default function FilesPanelWithUploader(
             uid={file.uid}
             filename={file.name}
             onDownload={download}
+            onDelete={deleteFile}
           />
         ))}
       </div>
