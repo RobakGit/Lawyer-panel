@@ -43,6 +43,8 @@ export default function CaseContainer() {
   const updateCaseData = async (data: {
     title?: string;
     destination?: string;
+    client?: string;
+    opponent?: string;
     status?: string;
     cooperator?: UserType;
     description?: string;
@@ -57,9 +59,9 @@ export default function CaseContainer() {
     return newComment.data.comment;
   };
 
-  const uploadFiles = async (files: File[]) => {
+  const uploadFiles = async (uploadedFiles: File[]) => {
     const formData = new FormData();
-    files.forEach((file) => {
+    uploadedFiles.forEach((file) => {
       formData.append("files", file);
     });
     axios
@@ -112,6 +114,8 @@ export default function CaseContainer() {
               title={caseData.title}
               date={new Date(caseData.createdAt)}
               destination={caseData.destination}
+              client={caseData.client}
+              opponent={caseData.opponent}
               status={caseData.status}
               cooperators={caseData.users}
               allUsers={allUsers}

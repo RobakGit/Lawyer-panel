@@ -29,7 +29,7 @@ export default function CaseActivityContainer(props: {
   };
 
   return (
-    <>
+    <div className={styles.container}>
       <h2>Aktywność</h2>
       <div className={styles.activityContainer}>
         {activities.map((activity) => (
@@ -40,6 +40,6 @@ export default function CaseActivityContainer(props: {
         ))}
       </div>
       <CommentInput onSend={addComment} />
-    </>
+    </div>
   );
 }

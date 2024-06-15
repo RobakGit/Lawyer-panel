@@ -43,6 +43,12 @@
   padding: 0 1rem;
 }
 
+.editable {
+  display: inline-block;
+  min-width: 1rem;
+  min-height: 1rem;
+}
+
 .editable:focus {
   outline-color: #f5f5f5;
   background-color: #eaeaea;

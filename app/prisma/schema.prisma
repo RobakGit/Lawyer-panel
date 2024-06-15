@@ -33,10 +33,12 @@ model User {
   emailVerified DateTime?  @map("email_verified") @db.Timestamptz
   status        userStatus @default(created)
 
-  cases    CaseOnUser[]
-  comments Comment[]
-  roles    RolesOnUsers[]
-  files    File[]
+  cases               CaseOnUser[]
+  comments            Comment[]
+  roles               RolesOnUsers[]
+  files               File[]
+  initiatedActivities Activity[]     @relation("InitiatedActivities")
+  receivedActivities  Activity[]     @relation("ReceivedActivities")
 
   @@map("user")
 }
@@ -83,6 +85,7 @@ model Case {
   client   Client?      @relation(fields: [clientId], references: [id])
   opponent Opponent?    @relation(fields: [opponentId], references: [id])
   files    File[]
+  activity Activity[]
 
   @@map("case")
 }
@@ -166,6 +169,26 @@ model File {
   user User @relation(fields: [uploadedBy], references: [id])
 
   @@map("file")
+}
+
+model Activity {
+  id              Int       @id @default(autoincrement())
+  uid             String    @unique @default(uuid()) @db.Uuid
+  title           String
+  message         String
+  initiatorUserId Int       @map("initiator_user_id")
+  targetCaseId    Int       @map("target_case_id")
+  affectedUserId  Int       @map("affected_user_id")
+  type            String
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  readAt          DateTime? @map("read_at") @db.Timestamptz
+
+  targetCase    Case @relation(fields: [targetCaseId], references: [id])
+  initiatorUser User @relation("InitiatedActivities", fields: [initiatorUserId], references: [id])
+  affectedUser  User @relation("ReceivedActivities", fields: [affectedUserId], references: [id])
+
+  @@map("activity")
 }
 
 enum userStatus {

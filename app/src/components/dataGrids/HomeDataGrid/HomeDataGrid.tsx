@@ -49,7 +49,7 @@ export default function HomeDataGrid(
   } = props;
 
   const columns: GridColDef[] = [
-    { field: "createdAt", headerName: "Data", width: 200 },
+    { field: "createdAt", headerName: "Data", width: 150 },
     { field: "title", headerName: "Tytuł", width: 200 },
     { field: "destination", headerName: "Miejsce", width: 150 },
     { field: "description", headerName: "Opis", width: 250 },
@@ -69,18 +69,21 @@ export default function HomeDataGrid(
     {
       field: "cooperators",
       headerName: "Współpracownicy",
-      width: 100,
+      width: 90,
       align: "center",
       renderCell: (params: GridCellParams<GridValidRowModel, UserType[]>) =>
         params.value && (
           <CooperatorsSelector
+            inline
             cooperators={params.value}
             allUsers={allUsers}
             onUserClick={(user) => onUserClick(`${params.id}`, user)}
           />
         ),
     },
-    { field: "nextEvent", headerName: "Następne wydarzenie", width: 150 },
+    // { field: "nextEvent", headerName: "Następne wydarzenie", width: 150 },
+    { field: "client", headerName: "Klient", width: 100 },
+    { field: "opponent", headerName: "Strona przeciwna", width: 100 },
     {
       field: "actions",
       headerName: "Akcje",
@@ -104,6 +107,8 @@ export default function HomeDataGrid(
             createdAt: new Date(caseItem.createdAt).toLocaleString(),
             description: clearHTMLTagsAndLimit(caseItem.description),
             cooperators: caseItem.users,
+            client: caseItem.client?.displayName,
+            opponent: caseItem.opponent?.displayName,
             id: caseItem.uid,
           };
         })}
