@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0.4rem 0;
+}
+
+.autocomplete, .autocomplete > * {
+    display: inline-block;
+    min-width: 200px;
+}

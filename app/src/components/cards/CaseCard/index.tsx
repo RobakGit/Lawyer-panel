@@ -1,11 +1,7 @@
 import uniqolor from "uniqolor";
 import styles from "@/styles/CaseCard.module.css";
-import CooperatorsAvatars from "@/components/avatars/CooperatorsAvatars";
 import StatusSelector from "@/components/inputs/StatusSelector";
-import { UserType } from "@/types/case";
-import DOMPurify from "isomorphic-dompurify";
-import axios from "axios";
-import { useState } from "react";
+import { ClientOrOpponentType, UserType } from "@/types/case";
 import CooperatorsSelector from "@/components/inputs/CooperatorsSelector";
 import { CaseStatus } from "@prisma/client";
 
@@ -15,6 +11,8 @@ export default function CaseCard(
     date: Date;
     title: string;
     destination: string | null;
+    client: ClientOrOpponentType | null;
+    opponent: ClientOrOpponentType | null;
     description: string | null;
     status: string;
     cooperators: UserType[];
@@ -29,6 +27,8 @@ export default function CaseCard(
     date,
     title,
     destination,
+    client,
+    opponent,
     description,
     status,
     cooperators,
@@ -70,7 +70,11 @@ export default function CaseCard(
             onUserClick={(user) => onUserClick(uid, user)}
           />
         </div>
-        <div className={styles.event}>{nextEvent}</div>
+        <div className={styles.event}>
+          <div className={styles.client}>{client?.displayName}</div>
+          <div className={styles.opponent}>{opponent?.displayName}</div>
+          {nextEvent}
+        </div>
       </div>
     </div>
   );

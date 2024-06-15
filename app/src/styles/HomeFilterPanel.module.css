@@ -1,0 +1,8 @@
+.container {
+    margin: 1rem 0;
+}
+
+.formControl {
+    margin-right: 1rem !important;
+    min-width: 100px !important;
+}

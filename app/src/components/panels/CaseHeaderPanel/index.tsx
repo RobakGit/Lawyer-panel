@@ -1,16 +1,22 @@
-import CooperatorsAvatars from "@/components/avatars/CooperatorsAvatars";
+import AutoCompleteInput from "@/components/inputs/AutoCompleteInput";
 import CooperatorsSelector from "@/components/inputs/CooperatorsSelector";
 import StatusSelector from "@/components/inputs/StatusSelector";
 import styles from "@/styles/CaseHeaderPanel.module.css";
-import { UserType } from "@/types/case";
-import { AxiosResponse } from "axios";
-import { useState } from "react";
+import {
+  ClientOrOpponentPayloadType,
+  ClientOrOpponentType,
+  UserType,
+} from "@/types/case";
+import axios, { AxiosResponse } from "axios";
+import { useEffect, useState } from "react";
 
 export default function CaseHeaderPanel(
   props: Readonly<{
     title: string;
     date: Date;
     destination: string | null;
+    client: ClientOrOpponentType | null;
+    opponent: ClientOrOpponentType | null;
     status: string;
     cooperators: UserType[];
     allUsers: UserType[];
@@ -18,6 +24,8 @@ export default function CaseHeaderPanel(
     updateCaseData: (data: {
       title?: string;
       destination?: string;
+      client?: string;
+      opponent?: string;
       status?: string;
       cooperator?: UserType;
       description?: string;
@@ -28,6 +36,8 @@ export default function CaseHeaderPanel(
     title,
     date,
     destination,
+    client,
+    opponent,
     status,
     cooperators,
     allUsers,
@@ -40,6 +50,17 @@ export default function CaseHeaderPanel(
   const [destinationValue, setDestinationValue] = useState(destination);
   const [statusValue, setStatusValue] = useState(status);
   const [cooperatorsValue, setCooperatorsValue] = useState(cooperators);
+  const [allClients, setAllClients] = useState<ClientOrOpponentType[]>([]);
+  const [allOpponents, setAllOpponents] = useState<ClientOrOpponentType[]>([]);
+
+  useEffect(() => {
+    axios.get("/api/client").then((response) => {
+      setAllClients(response.data);
+    });
+    axios.get("/api/opponent").then((response) => {
+      setAllOpponents(response.data);
+    });
+  }, []);
 
   const focusEdditedElement = (
     e: React.MouseEvent<HTMLElement>,
@@ -80,6 +101,26 @@ export default function CaseHeaderPanel(
     setCooperatorsValue(response.data.users);
   };
 
+  const createNewClient = async (data: ClientOrOpponentPayloadType) => {
+    const response = await axios.post("/api/client", data);
+    setAllClients((prev) => [...prev, response.data]);
+    return response.data.uid;
+  };
+
+  const createNewOpponent = async (data: ClientOrOpponentPayloadType) => {
+    const response = await axios.post("/api/opponent", data);
+    setAllOpponents((prev) => [...prev, response.data]);
+    return response.data.uid;
+  };
+
+  const selectClient = async (value: string) => {
+    updateCaseData({ client: value });
+  };
+
+  const selectOpponent = async (value: string) => {
+    updateCaseData({ opponent: value });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -108,6 +149,20 @@ export default function CaseHeaderPanel(
               {destinationValue}
             </i>
           </p>
+          <AutoCompleteInput
+            label="Klient"
+            options={allClients}
+            value={client?.uid ?? null}
+            selectOption={selectClient}
+            createNewOption={createNewClient}
+          />
+          <AutoCompleteInput
+            label="Przeciwnik"
+            options={allOpponents}
+            value={opponent?.uid ?? null}
+            selectOption={selectOpponent}
+            createNewOption={createNewOpponent}
+          />
           <div>
             Status:{" "}
             <StatusSelector
@@ -118,9 +173,9 @@ export default function CaseHeaderPanel(
         </div>
         <div className={styles.rightSide}>
           <div>
-            {/* Przypisani: <CooperatorsAvatars inline cooperators={cooperators} /> */}
             Przypisani:{" "}
             <CooperatorsSelector
+              inline
               cooperators={cooperatorsValue}
               allUsers={allUsers}
               onUserClick={onUserClick}

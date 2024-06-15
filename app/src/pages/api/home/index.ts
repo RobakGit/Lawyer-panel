@@ -7,11 +7,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
     const session = await getSession({ req });
     if (!session) return res.status(401).json({ message: "Unauthorized" });
+    const { client, opponent } = req.query;
     const cases = await prisma.case.findMany({
       where: {
         users: {
           some: { user: { is: { email: session.user?.email ?? "" } } },
         },
+        client: client ? { uid: client as string } : undefined,
+        opponent: opponent ? { uid: opponent as string } : undefined,
       },
       orderBy: { createdAt: "desc" },
       select: CaseBackendPrismaSelect,
@@ -23,6 +26,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         users: caseItem.users.map((user) => {
           return { ...user.user };
         }),
+        client: caseItem.client
+          ? {
+              uid: caseItem.client.uid,
+              displayName:
+                caseItem.client.name ??
+                `${caseItem.client.firstName} ${caseItem.client.lastName}`,
+            }
+          : null,
+        opponent: caseItem.opponent
+          ? {
+              uid: caseItem.opponent.uid,
+              displayName:
+                caseItem.opponent.name ??
+                `${caseItem.opponent.firstName} ${caseItem.opponent.lastName}`,
+            }
+          : null,
       };
     });
     res.json(response);

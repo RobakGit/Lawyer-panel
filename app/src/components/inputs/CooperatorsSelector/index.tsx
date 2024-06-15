@@ -7,9 +7,10 @@ import UserAvatar from "@/components/avatars/UserAvatar";
 export default function CooperatorsSelector(props: {
   cooperators: UserType[];
   allUsers: UserType[];
+  inline?: boolean;
   onUserClick: (user: UserType) => void;
 }) {
-  const { cooperators, allUsers, onUserClick } = props;
+  const { cooperators, allUsers, inline, onUserClick } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cooperatorsRef = useRef<HTMLElement>(null);
 
@@ -33,6 +34,7 @@ export default function CooperatorsSelector(props: {
       <CooperatorsAvatars
         ref={cooperatorsRef}
         cooperators={cooperators}
+        inline={inline}
         onClick={(e) => onClick(e, true)}
       />
       {cooperatorsRef && (

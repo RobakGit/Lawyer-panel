@@ -8,28 +8,47 @@ import styles from "@/styles/Home.module.css";
 import { useEffect, useState } from "react";
 import NotificationCard from "@/components/cards/NotificationCard";
 import axios from "axios";
-import { CaseBackendType, UserType } from "@/types/case";
+import { CaseBackendType, ClientOrOpponentType, UserType } from "@/types/case";
 import NewCard from "@/components/cards/CaseCard/NewCard";
 import DOMPurify from "isomorphic-dompurify";
 import HomeDataGrid from "@/components/dataGrids/HomeDataGrid/HomeDataGrid";
-import { CaseStatus } from "@prisma/client";
+import { Activity, CaseStatus } from "@prisma/client";
+import HomeFilterPanel from "@/components/panels/HomeFilterPanel/HomeFilterPanel";
 
 export default function Home() {
   const [cases, setCases] = useState<CaseBackendType[]>([]);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
+  const [clientFilter, setClientFilter] = useState<string>("");
+  const [opponentFilter, setOpponentFilter] = useState<string>("");
+  const [allClients, setAllClients] = useState<ClientOrOpponentType[]>([]);
+  const [allOpponents, setAllOpponents] = useState<ClientOrOpponentType[]>([]);
+  const [notifications, setNotifications] = useState<Activity[]>([]);
   const [stats, setStats] = useState<{ inProgress: number; new: number }>({
     inProgress: 0,
     new: 0,
   });
 
   useEffect(() => {
-    axios.get("/api/home").then((response) => {
+    const queryParams =
+      "?client=" + clientFilter + "&opponent=" + opponentFilter;
+    axios.get(`/api/home${queryParams}`).then((response) => {
       setCases(response.data);
     });
-    axios.get("/api/users").then((response) => {
-      setAllUsers(response.data);
-    });
-  }, []);
+    if (allUsers.length === 0) {
+      axios.get("/api/users").then((response) => {
+        setAllUsers(response.data);
+      });
+      axios.get("/api/client").then((response) => {
+        setAllClients(response.data);
+      });
+      axios.get("/api/opponent").then((response) => {
+        setAllOpponents(response.data);
+      });
+      axios.get("/api/notification").then((response) => {
+        setNotifications(response.data);
+      });
+    }
+  }, [clientFilter, opponentFilter]);
 
   useEffect(() => {
     setStats({
@@ -39,20 +58,6 @@ export default function Home() {
     });
   }, [cases]);
 
-  const notifications = [
-    {
-      date: new Date(),
-      type: "info",
-      title: "Nowa sprawa",
-      message: "Zostałeś dopisany do nowej sprawy",
-    },
-    {
-      date: new Date(),
-      type: "event",
-      title: "Zbliżajaca się rozprawa",
-      message: "Rozprawa w czwartek",
-    },
-  ];
   const [listType, setListType] = useState<"list" | "grid">("grid");
 
   const createNewCase = () => {
@@ -92,7 +97,7 @@ export default function Home() {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid className={styles.container} container spacing={2}>
       <Grid item xl={9}>
         <Grid container>
           <Grid item container>
@@ -112,7 +117,6 @@ export default function Home() {
               </Box>
             </Grid>
             <Grid item lg={2}>
-              {/* Dodać sortowanie/filtrowanie po klientach lub firmach ubezpieczeniowych */}
               <FormatListBulletedIcon
                 className={styles.icon}
                 sx={
@@ -136,6 +140,14 @@ export default function Home() {
                 }}
               />
             </Grid>
+            <Grid xs={12}>
+              <HomeFilterPanel
+                clients={allClients}
+                opponents={allOpponents}
+                setClientFilter={setClientFilter}
+                setOpponentFilter={setOpponentFilter}
+              />
+            </Grid>
           </Grid>
           <Grid item container spacing={1}>
             {listType === "grid" ? (
@@ -150,6 +162,8 @@ export default function Home() {
                       date={new Date(caseItem.createdAt)}
                       title={caseItem.title}
                       destination={caseItem.destination}
+                      client={caseItem.client}
+                      opponent={caseItem.opponent}
                       description={clearHTMLTagsAndLimit(caseItem.description)}
                       status={caseItem.status}
                       cooperators={caseItem.users}
@@ -178,7 +192,7 @@ export default function Home() {
         {notifications.map((notification) => (
           <NotificationCard
             key={uuidv4()}
-            date={notification.date}
+            date={new Date(notification.createdAt)}
             type={notification.type}
             title={notification.title}
             message={notification.message}

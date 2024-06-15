@@ -6,6 +6,21 @@ export type UserType = {
   lastName: string;
 };
 
+export type ClientOrOpponentType = {
+  uid: string;
+  displayName: string;
+};
+
+export type ClientOrOpponentPayloadType = {
+  firstName: string;
+  lastName: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  other: string;
+};
+
 export type Comment = {
   uid: string;
   content: string;
@@ -26,6 +41,8 @@ export type CaseBackendType = {
   status: CaseStatus;
   createdAt: Date;
   users: UserType[];
+  client: ClientOrOpponentType | null;
+  opponent: ClientOrOpponentType | null;
   comments: Comment[];
   files: File[];
 };
@@ -46,6 +63,22 @@ export const CaseBackendPrismaSelect = {
           lastName: true,
         },
       },
+    },
+  },
+  client: {
+    select: {
+      uid: true,
+      name: true,
+      firstName: true,
+      lastName: true,
+    },
+  },
+  opponent: {
+    select: {
+      uid: true,
+      name: true,
+      firstName: true,
+      lastName: true,
     },
   },
   comments: {
