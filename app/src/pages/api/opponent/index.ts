@@ -16,8 +16,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const response = opponents.map((opponent) => ({
       uid: opponent.uid,
-      displayName:
-        opponent.name ?? `${opponent.firstName} ${opponent.lastName}`,
+      displayName: opponent.name
+        ? opponent.name
+        : `${opponent.firstName} ${opponent.lastName}`,
     }));
     res.json(response);
   } else if (req.method === "POST") {
@@ -37,8 +38,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
     const response = {
       uid: newOpponent.uid,
-      displayName:
-        newOpponent.name ?? `${newOpponent.firstName} ${newOpponent.lastName}`,
+      displayName: newOpponent.name
+        ? newOpponent.name
+        : `${newOpponent.firstName} ${newOpponent.lastName}`,
     };
 
     res.json(response);
