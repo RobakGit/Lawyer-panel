@@ -31,6 +31,7 @@ export type Comment = {
 export type File = {
   uid: string;
   name: string;
+  isDirectory: boolean;
 };
 
 export type CaseBackendType = {
@@ -94,6 +95,7 @@ export const CaseBackendPrismaSelect = {
     select: {
       uid: true,
       name: true,
+      isDirectory: true,
     },
   },
 };

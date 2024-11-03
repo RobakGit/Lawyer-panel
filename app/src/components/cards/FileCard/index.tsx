@@ -32,23 +32,27 @@ export default function FileCard(
   props: Readonly<{
     uid: string;
     filename: string;
+    isDirectory: boolean;
     onDownload: (uid: string) => void;
     onDelete: (uid: string) => void;
   }>
 ) {
-  const { uid, filename, onDownload, onDelete } = props;
+  const { uid, filename, isDirectory, onDownload, onDelete } = props;
   const fileExtension = filename.split(".").pop();
   const [moreIconRef, setMoreIconRef] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(moreIconRef);
 
   const iconsWithAlt = {
+    dir: { icon: "/folder-icon.svg", alt: "folder icon" },
     pdf: { icon: "/pdf-icon.svg", alt: "pdf icon" },
     doc: { icon: "/doc-icon.svg", alt: "doc icon" },
     xls: { icon: "/xls-icon.svg", alt: "xls icon" },
   };
 
   const getFileIconData = (extension?: string) => {
-    if (extension?.includes("pdf")) {
+    if (isDirectory) {
+      return iconsWithAlt.dir;
+    } else if (extension?.includes("pdf")) {
       return iconsWithAlt.pdf;
     } else if (extension?.includes("doc")) {
       return iconsWithAlt.doc;
@@ -60,12 +64,12 @@ export default function FileCard(
   };
 
   const onSelectMenuClick = (
-    e: React.MouseEvent<HTMLElement>,
+    _e: React.MouseEvent<HTMLElement>,
     index: number
   ) => {
     const action = selectMenuList[index].actionName;
     if (action === "view") {
-      console.log("viewing file");
+      isDirectory ? console.log("open dir") : console.log("viewing file");
     }
     if (action === "download") {
       onDownload(uid);
@@ -74,7 +78,6 @@ export default function FileCard(
       console.log("deleting file");
       onDelete(uid);
     }
-    return;
   };
 
   return (

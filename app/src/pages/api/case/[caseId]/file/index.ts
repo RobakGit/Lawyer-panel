@@ -28,19 +28,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (!session || !session.user?.email) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const filesArr = files.files as formidable.File[];
       let filesData = [];
-      for await (const file of filesArr) {
-        const newFile = await prisma.file.create({
+      if (fields.directory) {
+        const newDirectory = await prisma.file.create({
           data: {
-            name: file.originalFilename as string,
-            path: `${uploadDir}/${file.newFilename}`,
+            name: fields.directory[0],
+            path: "",
+            isDirectory: true,
             case: { connect: { uid: req.query.caseId as string } },
             user: { connect: { email: session.user.email } },
           },
-          select: { uid: true, name: true },
+          select: { uid: true, name: true, isDirectory: true },
         });
-        filesData.push(newFile);
+        filesData.push(newDirectory);
+      } else {
+        const filesArr = files.files as formidable.File[];
+        for await (const file of filesArr) {
+          const newFile = await prisma.file.create({
+            data: {
+              name: file.originalFilename as string,
+              path: `${uploadDir}/${file.newFilename}`,
+              case: { connect: { uid: req.query.caseId as string } },
+              user: { connect: { email: session.user.email } },
+            },
+            select: { uid: true, name: true, isDirectory: true },
+          });
+          filesData.push(newFile);
+        }
       }
 
       res.json({ filesData });

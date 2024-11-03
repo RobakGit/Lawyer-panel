@@ -9,7 +9,8 @@ import { ReactElement } from "react";
 
 export default function SelectMenuList(
   props: Readonly<{
-    anchorEl: null | HTMLElement;
+    anchorEl?: null | HTMLElement;
+    anchorPosition?: { top: number; left: number };
     isMenuOpen: boolean;
     onClose: (e: React.MouseEvent<HTMLElement>) => void;
     onClick: (e: React.MouseEvent<HTMLElement>, index: number) => void;
@@ -21,7 +22,14 @@ export default function SelectMenuList(
     }>;
   }>
 ) {
-  const { anchorEl, isMenuOpen, onClose, onClick, menuElements } = props;
+  const {
+    anchorEl,
+    anchorPosition,
+    isMenuOpen,
+    onClose,
+    onClick,
+    menuElements,
+  } = props;
 
   const onMenuItemClick = (e: React.MouseEvent<HTMLElement>, index: number) => {
     onClick(e, index);
@@ -29,7 +37,13 @@ export default function SelectMenuList(
   };
 
   return (
-    <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={onClose}>
+    <Menu
+      anchorEl={anchorEl}
+      anchorReference={anchorPosition ? "anchorPosition" : "anchorEl"}
+      anchorPosition={anchorPosition}
+      open={isMenuOpen}
+      onClose={onClose}
+    >
       {menuElements.map((element, index) => (
         <MenuItem
           key={element.text}

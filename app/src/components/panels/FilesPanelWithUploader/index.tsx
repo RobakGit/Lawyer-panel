@@ -3,6 +3,8 @@ import FileCard from "../../cards/FileCard";
 import { Button } from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import { File as FileType } from "@/types/case";
+import { useState } from "react";
+import FilesContextMenu from "@/components/inputs/FilesContextMenu";
 
 export default function FilesPanelWithUploader(
   props: Readonly<{
@@ -10,9 +12,18 @@ export default function FilesPanelWithUploader(
     uploadFiles: (files: File[]) => void;
     onDownload?: (uid: string) => void;
     onDelete?: (uid: string) => void;
+    onNewDirectory?: () => void;
   }>
 ) {
-  const { files, uploadFiles, onDownload, onDelete } = props;
+  const { files, uploadFiles, onDownload, onDelete, onNewDirectory } = props;
+
+  const [fileConentMenuPosition, setFileContentMenuPosition] = useState<
+    | {
+        top: number;
+        left: number;
+      }
+    | undefined
+  >(undefined);
 
   const onDrop = (acceptedFiles: File[]) => {
     uploadFiles(acceptedFiles);
@@ -32,6 +43,16 @@ export default function FilesPanelWithUploader(
     return;
   };
 
+  const newDirectory = () => {
+    onNewDirectory && onNewDirectory();
+    return;
+  };
+
+  const FileGridHandleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setFileContentMenuPosition({ top: e.clientY, left: e.clientX });
+  };
+
   return (
     <div
       className={styles.container}
@@ -43,16 +64,25 @@ export default function FilesPanelWithUploader(
       }
     >
       <h3>Pliki:</h3>
-      <div className={styles.filesGridContainer}>
+      <div
+        className={styles.filesGridContainer}
+        onContextMenu={FileGridHandleContextMenu}
+      >
         {files.map((file) => (
           <FileCard
             key={file.uid}
             uid={file.uid}
             filename={file.name}
+            isDirectory={file.isDirectory}
             onDownload={download}
             onDelete={deleteFile}
           />
         ))}
+        <FilesContextMenu
+          anchorPosition={fileConentMenuPosition}
+          onClose={() => setFileContentMenuPosition(undefined)}
+          onNewDirectory={newDirectory}
+        />
       </div>
       <span className={styles.uploadPrompt}>
         Aby dodać plik, przeciągnij go tutaj lub kliknij poniżej

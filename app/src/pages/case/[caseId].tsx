@@ -76,6 +76,17 @@ export default function CaseContainer() {
       });
   };
 
+  const createDirectory = async () => {
+    const formData = new FormData();
+    formData.append("directory", "Nowy Folder");
+    axios
+      .post(`/api/case/${caseId.current}/file`, formData)
+      .then((response) => {
+        const filesData = response.data.filesData;
+        setFiles((prevFiles) => [...prevFiles, ...filesData]);
+      });
+  };
+
   const downloadFile = async (uid: string) => {
     const response = await fetch(`/api/case/${caseId.current}/file/${uid}`);
     const fileName = response.headers.get("Content-Disposition")?.split("=")[1];
@@ -156,6 +167,7 @@ export default function CaseContainer() {
             uploadFiles={uploadFiles}
             onDownload={downloadFile}
             onDelete={deleteFile}
+            onNewDirectory={createDirectory}
           />
         </Grid>
       </Grid>
