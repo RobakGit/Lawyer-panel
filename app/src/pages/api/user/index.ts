@@ -1,6 +1,6 @@
-import CaseApiController from "@/backend/service/case/CaseApiController";
+import UserApiController from "@/backend/service/user/UserApiController";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  await new CaseApiController(req, res).process();
+  await new UserApiController(req, res).process();
 };

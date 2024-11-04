@@ -29,7 +29,7 @@ export default function CaseContainer() {
       setDescription(response.data.description);
     });
 
-    axios.get("/api/users").then((response) => {
+    axios.get("/api/user").then((response) => {
       setAllUsers(response.data);
     });
   }, [router]);

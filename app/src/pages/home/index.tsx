@@ -35,7 +35,7 @@ export default function Home() {
       setCases(response.data);
     });
     if (allUsers.length === 0) {
-      axios.get("/api/users").then((response) => {
+      axios.get("/api/user").then((response) => {
         setAllUsers(response.data);
       });
       axios.get("/api/client").then((response) => {
