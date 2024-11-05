@@ -1,4 +1,4 @@
-import { Button, Grid, Input } from "@mui/material";
+import { Button, Grid2 as Grid, Input } from "@mui/material";
 import styles from "@/styles/Login.module.css";
 import { ReactNode, useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
@@ -22,16 +22,13 @@ const Login = () => {
   return (
     <Grid container className={styles.main}>
       <Grid
-        item
         container
-        xs={12}
-        sm={6}
-        md={4}
+        size={{ xs: 12, sm: 6, md: 4 }}
         gap={3}
         className={styles.pane}
         direction="column"
       >
-        <Grid item>
+        <Grid>
           <Input
             className={styles.input}
             placeholder="Email"
@@ -39,7 +36,7 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </Grid>
-        <Grid item>
+        <Grid>
           <Button
             className={styles.button}
             variant="contained"

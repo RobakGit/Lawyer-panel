@@ -2,7 +2,7 @@ import TextEditor from "@/components/TextEditor";
 import CaseHeaderPanel from "@/components/panels/CaseHeaderPanel";
 import FilesPanelWithUploader from "@/components/panels/FilesPanelWithUploader";
 import CaseActivityContainer from "@/containers/CaseActivityContainer";
-import { Grid } from "@mui/material";
+import { Grid2 as Grid } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import axios from "axios";
@@ -111,15 +111,14 @@ export default function CaseContainer() {
   return (
     <Grid container>
       <Grid
-        item
         container
-        xs={8}
+        size={{ xs: 8 }}
         direction={"column"}
         gap={2}
         // maxHeight={"100vh"}
         // overflow={"auto"}
       >
-        <Grid item>
+        <Grid>
           {caseData && (
             <CaseHeaderPanel
               title={caseData.title}
@@ -137,7 +136,6 @@ export default function CaseContainer() {
         </Grid>
         <Grid
           onDoubleClick={() => setIsDescriptionEditing(true)}
-          item
           p={1}
           textAlign={"justify"}
           fontSize={20}
@@ -161,7 +159,7 @@ export default function CaseContainer() {
             "Brak opisu... Kliknij dwukrotnie, aby dodać."
           )}
         </Grid>
-        <Grid item>
+        <Grid>
           <FilesPanelWithUploader
             files={files}
             uploadFiles={uploadFiles}
@@ -171,7 +169,7 @@ export default function CaseContainer() {
           />
         </Grid>
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={{ xs: 4 }}>
         <CaseActivityContainer
           comments={caseData?.comments ?? []}
           sendComment={sendComment}

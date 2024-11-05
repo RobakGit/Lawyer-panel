@@ -1,6 +1,6 @@
 import CaseCard from "@/components/cards/CaseCard";
 import NumberStat from "@/components/statistics/NumberStat";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid2 as Grid } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
@@ -98,96 +98,88 @@ export default function Home() {
 
   return (
     <Grid className={styles.container} container spacing={2}>
-      <Grid item xl={9}>
+      <Grid size={{ xl: 9 }}>
         <Grid container>
-          <Grid item container>
-            <Grid item xs={10}>
-              Sprawy
-            </Grid>
-            <Grid item xs={2}>
-              {new Date().toLocaleDateString()}
-            </Grid>
+          <Grid size={{ xs: 10 }}>Sprawy</Grid>
+          <Grid size={{ xs: 2 }}>{new Date().toLocaleDateString()}</Grid>
+        </Grid>
+        <Grid container>
+          <Grid container size={{ lg: 10 }} spacing={2}>
+            <NumberStat number={stats.inProgress} label={"W trakcie"} />
+            <NumberStat number={stats.new} label={"Nowe"} />
+            <NumberStat number={cases.length} label={"Wszystkie"} />
           </Grid>
-          <Grid item container>
-            <Grid item lg={10}>
-              <Box display={"flex"} flexDirection={"row"}>
-                <NumberStat number={stats.inProgress} label={"W trakcie"} />
-                <NumberStat number={stats.new} label={"Nowe"} />
-                <NumberStat number={cases.length} label={"Wszystkie"} />
-              </Box>
-            </Grid>
-            <Grid item lg={2}>
-              <FormatListBulletedIcon
-                className={styles.icon}
-                sx={
-                  listType === "list"
-                    ? { bgcolor: "black", color: "white" }
-                    : { ":hover": { bgcolor: "grey", color: "white" } }
-                }
-                onClick={() => {
-                  setListType("list");
-                }}
-              />
-              <ViewModuleIcon
-                className={styles.icon}
-                sx={
-                  listType === "grid"
-                    ? { bgcolor: "black", color: "white" }
-                    : { ":hover": { bgcolor: "grey", color: "white" } }
-                }
-                onClick={() => {
-                  setListType("grid");
-                }}
-              />
-            </Grid>
-            <Grid xs={12}>
-              <HomeFilterPanel
-                clients={allClients}
-                opponents={allOpponents}
-                setClientFilter={setClientFilter}
-                setOpponentFilter={setOpponentFilter}
-              />
-            </Grid>
+          <Grid size={{ lg: 2 }}>
+            <FormatListBulletedIcon
+              className={styles.icon}
+              sx={
+                listType === "list"
+                  ? { bgcolor: "black", color: "white" }
+                  : { ":hover": { bgcolor: "grey", color: "white" } }
+              }
+              onClick={() => {
+                setListType("list");
+              }}
+            />
+            <ViewModuleIcon
+              className={styles.icon}
+              sx={
+                listType === "grid"
+                  ? { bgcolor: "black", color: "white" }
+                  : { ":hover": { bgcolor: "grey", color: "white" } }
+              }
+              onClick={() => {
+                setListType("grid");
+              }}
+            />
           </Grid>
-          <Grid item container spacing={1}>
-            {listType === "grid" ? (
-              <>
-                <Grid item xs={6} md={4} xl={3}>
-                  <NewCard onClick={createNewCase} />
-                </Grid>
-                {cases.map((caseItem) => (
-                  <Grid key={caseItem.uid} item xs={6} md={4} xl={3}>
-                    <CaseCard
-                      uid={caseItem.uid}
-                      date={new Date(caseItem.createdAt)}
-                      title={caseItem.title}
-                      destination={caseItem.destination}
-                      client={caseItem.client}
-                      opponent={caseItem.opponent}
-                      description={clearHTMLTagsAndLimit(caseItem.description)}
-                      status={caseItem.status}
-                      cooperators={caseItem.users}
-                      allUsers={allUsers}
-                      onStatusChange={changeStatus}
-                      onUserClick={changeUsers}
-                      nextEvent={undefined}
-                    />
-                  </Grid>
-                ))}
-              </>
-            ) : (
-              <HomeDataGrid
-                cases={cases}
-                clearHTMLTagsAndLimit={clearHTMLTagsAndLimit}
-                allUsers={allUsers}
-                onStatusChange={changeStatus}
-                onUserClick={changeUsers}
-              />
-            )}
+          <Grid size={{ xs: 12 }}>
+            <HomeFilterPanel
+              clients={allClients}
+              opponents={allOpponents}
+              setClientFilter={setClientFilter}
+              setOpponentFilter={setOpponentFilter}
+            />
           </Grid>
         </Grid>
+        <Grid container spacing={1}>
+          {listType === "grid" ? (
+            <>
+              <Grid size={{ xs: 6, md: 4, xl: 3 }}>
+                <NewCard onClick={createNewCase} />
+              </Grid>
+              {cases.map((caseItem) => (
+                <Grid key={caseItem.uid} size={{ xs: 6, md: 4, xl: 3 }}>
+                  <CaseCard
+                    uid={caseItem.uid}
+                    date={new Date(caseItem.createdAt)}
+                    title={caseItem.title}
+                    destination={caseItem.destination}
+                    client={caseItem.client}
+                    opponent={caseItem.opponent}
+                    description={clearHTMLTagsAndLimit(caseItem.description)}
+                    status={caseItem.status}
+                    cooperators={caseItem.users}
+                    allUsers={allUsers}
+                    onStatusChange={changeStatus}
+                    onUserClick={changeUsers}
+                    nextEvent={undefined}
+                  />
+                </Grid>
+              ))}
+            </>
+          ) : (
+            <HomeDataGrid
+              cases={cases}
+              clearHTMLTagsAndLimit={clearHTMLTagsAndLimit}
+              allUsers={allUsers}
+              onStatusChange={changeStatus}
+              onUserClick={changeUsers}
+            />
+          )}
+        </Grid>
       </Grid>
-      <Grid item xl={3}>
+      <Grid size={{ xl: 3 }}>
         Powiadomienia
         {notifications.map((notification) => (
           <NotificationCard
