@@ -1,6 +1,6 @@
 import CaseCard from "@/components/cards/CaseCard";
 import NumberStat from "@/components/statistics/NumberStat";
-import { Box, Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
