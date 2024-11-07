@@ -36,9 +36,14 @@ export default function HomeFilterPanel(
 
   return (
     <div className={styles.container}>
-      <FormControl className={styles.formControl}>
-        <InputLabel id="client-filter">Klient</InputLabel>
-        <Select value={clientValue} onChange={onClientSelect}>
+      <FormControl variant="standard" className={styles.formControl}>
+        <InputLabel htmlFor="client-filter">Klient</InputLabel>
+        <Select
+          id="client-filter"
+          label="Klient"
+          value={clientValue}
+          onChange={onClientSelect}
+        >
           <MenuItem value={""}>Wszystkie</MenuItem>
           {clients.map((client) => (
             <MenuItem key={client.uid} value={client.uid}>
@@ -46,11 +51,15 @@ export default function HomeFilterPanel(
             </MenuItem>
           ))}
         </Select>
-        <FormHelperText>Klienci</FormHelperText>
       </FormControl>
-      <FormControl className={styles.formControl}>
-        <InputLabel id="opponent-filter">Przeciwnik</InputLabel>
-        <Select value={opponentValue} onChange={onOpponentSelect}>
+      <FormControl variant="standard" className={styles.formControl}>
+        <InputLabel htmlFor="opponent-filter">Przeciwnik</InputLabel>
+        <Select
+          id="opponent-filter"
+          label="Przeciwnik"
+          value={opponentValue}
+          onChange={onOpponentSelect}
+        >
           <MenuItem value={""}>Wszystkie</MenuItem>
           {opponents.map((opponent) => (
             <MenuItem key={opponent.uid} value={opponent.uid}>
@@ -58,7 +67,6 @@ export default function HomeFilterPanel(
             </MenuItem>
           ))}
         </Select>
-        <FormHelperText>Strony przeciwne</FormHelperText>
       </FormControl>
     </div>
   );

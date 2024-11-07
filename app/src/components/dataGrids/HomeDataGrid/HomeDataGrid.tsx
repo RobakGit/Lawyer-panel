@@ -1,6 +1,5 @@
 import CooperatorsSelector from "@/components/inputs/CooperatorsSelector";
 import StatusSelector from "@/components/inputs/StatusSelector";
-import styles from "@/styles/HomeDataGrid.module.css";
 
 import { CaseBackendType, UserType } from "@/types/case";
 import { Visibility } from "@mui/icons-material";
@@ -49,7 +48,11 @@ export default function HomeDataGrid(
   } = props;
 
   const columns: GridColDef[] = [
-    { field: "createdAt", headerName: "Data", width: 150 },
+    {
+      field: "createdAt",
+      headerName: "Data",
+      width: 100,
+    },
     { field: "title", headerName: "Tytuł", width: 200 },
     { field: "destination", headerName: "Miejsce", width: 150 },
     { field: "description", headerName: "Opis", width: 250 },
@@ -81,9 +84,8 @@ export default function HomeDataGrid(
           />
         ),
     },
-    // { field: "nextEvent", headerName: "Następne wydarzenie", width: 150 },
-    { field: "client", headerName: "Klient", width: 100 },
-    { field: "opponent", headerName: "Strona przeciwna", width: 100 },
+    { field: "client", headerName: "Klient", width: 125 },
+    { field: "opponent", headerName: "Strona przeciwna", width: 125 },
     {
       field: "actions",
       headerName: "Akcje",
@@ -99,25 +101,23 @@ export default function HomeDataGrid(
   ];
 
   return (
-    <div className={styles.container}>
-      <StyledDataGrid
-        rows={cases.map((caseItem, index) => {
-          return {
-            ...caseItem,
-            createdAt: new Date(caseItem.createdAt).toLocaleString(),
-            description: clearHTMLTagsAndLimit(caseItem.description),
-            cooperators: caseItem.users,
-            client: caseItem.client?.displayName,
-            opponent: caseItem.opponent?.displayName,
-            id: caseItem.uid,
-          };
-        })}
-        columns={columns}
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-        }
-        disableRowSelectionOnClick
-      />
-    </div>
+    <StyledDataGrid
+      rows={cases.map((caseItem, index) => {
+        return {
+          ...caseItem,
+          createdAt: new Date(caseItem.createdAt).toLocaleDateString(),
+          description: clearHTMLTagsAndLimit(caseItem.description),
+          cooperators: caseItem.users,
+          client: caseItem.client?.displayName,
+          opponent: caseItem.opponent?.displayName,
+          id: caseItem.uid,
+        };
+      })}
+      columns={columns}
+      getRowClassName={(params) =>
+        params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+      }
+      disableRowSelectionOnClick
+    />
   );
 }

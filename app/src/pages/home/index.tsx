@@ -1,6 +1,5 @@
-import CaseCard from "@/components/cards/CaseCard";
 import NumberStat from "@/components/statistics/NumberStat";
-import { Grid2 as Grid } from "@mui/material";
+import { Button, Grid2 as Grid } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
@@ -9,11 +8,12 @@ import { useEffect, useState } from "react";
 import NotificationCard from "@/components/cards/NotificationCard";
 import axios from "axios";
 import { CaseBackendType, ClientOrOpponentType, UserType } from "@/types/case";
-import NewCard from "@/components/cards/CaseCard/NewCard";
 import DOMPurify from "isomorphic-dompurify";
 import HomeDataGrid from "@/components/dataGrids/HomeDataGrid/HomeDataGrid";
 import { Activity, CaseStatus } from "@prisma/client";
 import HomeFilterPanel from "@/components/panels/HomeFilterPanel/HomeFilterPanel";
+import { KanbanGrid } from "@/components/dragAndDrop/KanbanGrid";
+import { Add } from "@mui/icons-material";
 
 export default function Home() {
   const [cases, setCases] = useState<CaseBackendType[]>([]);
@@ -96,6 +96,12 @@ export default function Home() {
     );
   };
 
+  const getViewIconClass = (type: "list" | "grid") => {
+    return `${styles.icon} ${
+      styles[listType === type ? "activeViewIcon" : "inactiveViewIcon"]
+    }`;
+  };
+
   return (
     <Grid className={styles.container} container spacing={2}>
       <Grid size={{ xl: 9 }}>
@@ -111,63 +117,59 @@ export default function Home() {
           </Grid>
           <Grid size={{ lg: 2 }}>
             <FormatListBulletedIcon
-              className={styles.icon}
-              sx={
-                listType === "list"
-                  ? { bgcolor: "black", color: "white" }
-                  : { ":hover": { bgcolor: "grey", color: "white" } }
-              }
-              onClick={() => {
-                setListType("list");
-              }}
+              className={getViewIconClass("list")}
+              onClick={() => setListType("list")}
             />
             <ViewModuleIcon
-              className={styles.icon}
-              sx={
-                listType === "grid"
-                  ? { bgcolor: "black", color: "white" }
-                  : { ":hover": { bgcolor: "grey", color: "white" } }
-              }
-              onClick={() => {
-                setListType("grid");
-              }}
+              className={getViewIconClass("grid")}
+              onClick={() => setListType("grid")}
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
-            <HomeFilterPanel
-              clients={allClients}
-              opponents={allOpponents}
-              setClientFilter={setClientFilter}
-              setOpponentFilter={setOpponentFilter}
-            />
+          <Grid container size={{ xs: 12 }}>
+            <Grid size={{ xs: 6 }}>
+              <HomeFilterPanel
+                clients={allClients}
+                opponents={allOpponents}
+                setClientFilter={setClientFilter}
+                setOpponentFilter={setOpponentFilter}
+              />
+            </Grid>
+            <Grid
+              size={{ xs: 6 }}
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                onClick={createNewCase}
+                variant="contained"
+                startIcon={<Add />}
+              >
+                Dodaj sprawę
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
         <Grid container spacing={1}>
           {listType === "grid" ? (
-            <>
-              <Grid size={{ xs: 6, md: 4, xl: 3 }}>
-                <NewCard onClick={createNewCase} />
-              </Grid>
-              {cases.map((caseItem) => (
-                <Grid key={caseItem.uid} size={{ xs: 6, md: 4, xl: 3 }}>
-                  <CaseCard
-                    uid={caseItem.uid}
-                    date={new Date(caseItem.createdAt)}
-                    title={caseItem.title}
-                    destination={caseItem.destination}
-                    client={caseItem.client}
-                    opponent={caseItem.opponent}
-                    description={clearHTMLTagsAndLimit(caseItem.description)}
-                    status={caseItem.status}
-                    cooperators={caseItem.users}
-                    allUsers={allUsers}
-                    onStatusChange={changeStatus}
-                    onUserClick={changeUsers}
-                    nextEvent={undefined}
-                  />
-                </Grid>
-              ))}
-            </>
+            <KanbanGrid
+              cases={cases.map((caseItem) => ({
+                uid: caseItem.uid,
+                date: new Date(caseItem.createdAt),
+                title: caseItem.title,
+                destination: caseItem.destination,
+                client: caseItem.client,
+                opponent: caseItem.opponent,
+                description: clearHTMLTagsAndLimit(caseItem.description),
+                status: caseItem.status,
+                cooperators: caseItem.users,
+                allUsers: allUsers,
+                onUserClick: changeUsers,
+              }))}
+              onDrop={changeStatus}
+            />
           ) : (
             <HomeDataGrid
               cases={cases}
