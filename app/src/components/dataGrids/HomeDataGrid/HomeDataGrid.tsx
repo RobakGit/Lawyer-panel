@@ -12,6 +12,7 @@ import {
   gridClasses,
 } from "@mui/x-data-grid";
 import { CaseStatus } from "@prisma/client";
+import { useEffect, useRef, useState } from "react";
 
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   [`& .${gridClasses.row}.even`]: {
@@ -46,6 +47,27 @@ export default function HomeDataGrid(
     onStatusChange,
     onUserClick,
   } = props;
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const [gridWidth, setGridWidth] = useState<number>(0);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setGridWidth(entry.contentRect.width);
+      }
+    });
+
+    if (gridContainerRef.current) {
+      resizeObserver.observe(gridContainerRef.current);
+    }
+
+    return () => {
+      if (gridContainerRef.current) {
+        resizeObserver.unobserve(gridContainerRef.current);
+      }
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const columns: GridColDef[] = [
     {
@@ -55,11 +77,16 @@ export default function HomeDataGrid(
     },
     { field: "title", headerName: "Tytuł", width: 200 },
     { field: "destination", headerName: "Miejsce", width: 150 },
-    { field: "description", headerName: "Opis", width: 250 },
+    {
+      field: "description",
+      headerName: "Opis",
+      minWidth: 250,
+      width: gridWidth - 1002,
+    },
     {
       field: "status",
       headerName: "Status",
-      width: 110,
+      width: 120,
       align: "center",
       renderCell: (params: GridCellParams<GridValidRowModel, string>) =>
         params.value && (
@@ -89,7 +116,7 @@ export default function HomeDataGrid(
     {
       field: "actions",
       headerName: "Akcje",
-      width: 100,
+      width: 90,
       align: "center",
       renderCell: (params: GridCellParams) => (
         <Visibility
@@ -101,23 +128,25 @@ export default function HomeDataGrid(
   ];
 
   return (
-    <StyledDataGrid
-      rows={cases.map((caseItem, index) => {
-        return {
-          ...caseItem,
-          createdAt: new Date(caseItem.createdAt).toLocaleDateString(),
-          description: clearHTMLTagsAndLimit(caseItem.description),
-          cooperators: caseItem.users,
-          client: caseItem.client?.displayName,
-          opponent: caseItem.opponent?.displayName,
-          id: caseItem.uid,
-        };
-      })}
-      columns={columns}
-      getRowClassName={(params) =>
-        params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-      }
-      disableRowSelectionOnClick
-    />
+    <div ref={gridContainerRef} style={{ width: "100%" }}>
+      <StyledDataGrid
+        rows={cases.map((caseItem, index) => {
+          return {
+            ...caseItem,
+            createdAt: new Date(caseItem.createdAt).toLocaleDateString(),
+            description: clearHTMLTagsAndLimit(caseItem.description),
+            cooperators: caseItem.users,
+            client: caseItem.client?.displayName,
+            opponent: caseItem.opponent?.displayName,
+            id: caseItem.uid,
+          };
+        })}
+        columns={columns}
+        getRowClassName={(params) =>
+          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+        }
+        disableRowSelectionOnClick
+      />
+    </div>
   );
 }

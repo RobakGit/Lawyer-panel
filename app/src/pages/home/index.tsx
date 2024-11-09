@@ -1,11 +1,9 @@
 import NumberStat from "@/components/statistics/NumberStat";
 import { Button, Grid2 as Grid } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import styles from "@/styles/Home.module.css";
 import { useEffect, useState } from "react";
-import NotificationCard from "@/components/cards/NotificationCard";
 import axios from "axios";
 import { CaseBackendType, ClientOrOpponentType, UserType } from "@/types/case";
 import DOMPurify from "isomorphic-dompurify";
@@ -13,7 +11,8 @@ import HomeDataGrid from "@/components/dataGrids/HomeDataGrid/HomeDataGrid";
 import { Activity, CaseStatus } from "@prisma/client";
 import HomeFilterPanel from "@/components/panels/HomeFilterPanel/HomeFilterPanel";
 import { KanbanGrid } from "@/components/dragAndDrop/KanbanGrid";
-import { Add } from "@mui/icons-material";
+import { Add, Notifications } from "@mui/icons-material";
+import NotificationsPanel from "@/components/panels/NotificationsPanel";
 
 export default function Home() {
   const [cases, setCases] = useState<CaseBackendType[]>([]);
@@ -27,6 +26,8 @@ export default function Home() {
     inProgress: 0,
     new: 0,
   });
+  const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
+  const panelTransition = "all .2s ease-in-out";
 
   useEffect(() => {
     const queryParams =
@@ -67,13 +68,13 @@ export default function Home() {
   };
 
   const clearHTMLTagsAndLimit = (text: string | null) => {
-    return (
-      DOMPurify.sanitize(text || "Brak", {
-        ALLOWED_TAGS: [],
-      })
-        .replace(/\n/g, " ")
-        .slice(0, 100) + "..."
-    );
+    const textLimit = 200;
+    const clearText = DOMPurify.sanitize(text || "Brak", {
+      ALLOWED_TAGS: [],
+    }).replace(/\n/g, " ");
+    return clearText.length > textLimit
+      ? clearText.slice(0, textLimit) + "..."
+      : clearText;
   };
 
   const changeStatus = async (uid: string, newStatus: CaseStatus) => {
@@ -104,7 +105,10 @@ export default function Home() {
 
   return (
     <Grid className={styles.container} container spacing={2}>
-      <Grid size={{ xl: 9 }}>
+      <Grid
+        size={{ md: isNotificationOpen ? 9 : 11.5 }}
+        style={{ transition: panelTransition }}
+      >
         <Grid container>
           <Grid size={{ xs: 10 }}>Sprawy</Grid>
           <Grid size={{ xs: 2 }}>{new Date().toLocaleDateString()}</Grid>
@@ -181,17 +185,22 @@ export default function Home() {
           )}
         </Grid>
       </Grid>
-      <Grid size={{ xl: 3 }}>
-        Powiadomienia
-        {notifications.map((notification) => (
-          <NotificationCard
-            key={uuidv4()}
-            date={new Date(notification.createdAt)}
-            type={notification.type}
-            title={notification.title}
-            message={notification.message}
+      <Grid
+        size={{ md: isNotificationOpen ? 3 : 0.5 }}
+        style={{
+          transition: panelTransition,
+        }}
+      >
+        <div style={{ position: "sticky", top: 10 }}>
+          <Notifications
+            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+            cursor="pointer"
           />
-        ))}
+          <NotificationsPanel
+            notifications={notifications}
+            isOpen={isNotificationOpen}
+          />
+        </div>
       </Grid>
     </Grid>
   );
