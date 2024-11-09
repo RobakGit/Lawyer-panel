@@ -1,10 +1,12 @@
 .container {
+  --activity-containers-height: calc(97vh - 5.6rem - 20px);
   position: sticky;
   top: 2rem;
+  height: var(--activity-containers-height);
 }
 
 .activityContainer {
-  height: 80vh;
+  max-height: var(--activity-containers-height);
   overflow-y: auto;
   margin-top: 20px;
 }

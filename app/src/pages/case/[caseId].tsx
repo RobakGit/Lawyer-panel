@@ -109,15 +109,8 @@ export default function CaseContainer() {
   };
 
   return (
-    <Grid container>
-      <Grid
-        container
-        size={{ xs: 8 }}
-        direction={"column"}
-        gap={2}
-        // maxHeight={"100vh"}
-        // overflow={"auto"}
-      >
+    <Grid container minHeight="calc(97vh - 2rem)">
+      <Grid container size={{ xs: 8 }} direction={"column"} gap={2}>
         <Grid>
           {caseData && (
             <CaseHeaderPanel
@@ -140,9 +133,11 @@ export default function CaseContainer() {
           textAlign={"justify"}
           fontSize={20}
           lineHeight={1.5}
+          minHeight={200}
         >
           {isDescriptionEditing ? (
             <TextEditor
+              style={{ minHeight: 200 }}
               content={description ?? ""}
               save={(content) => saveDescription(content)}
             />
@@ -159,7 +154,7 @@ export default function CaseContainer() {
             "Brak opisu... Kliknij dwukrotnie, aby dodać."
           )}
         </Grid>
-        <Grid>
+        <Grid marginTop={"auto"}>
           <FilesPanelWithUploader
             files={files}
             uploadFiles={uploadFiles}

@@ -59,7 +59,7 @@ export default function HomeDataGrid(
     {
       field: "status",
       headerName: "Status",
-      width: 100,
+      width: 110,
       align: "center",
       renderCell: (params: GridCellParams<GridValidRowModel, string>) =>
         params.value && (
