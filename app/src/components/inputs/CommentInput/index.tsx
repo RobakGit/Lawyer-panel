@@ -3,17 +3,20 @@ import styles from "@/styles/CommentInput.module.css";
 import { Button } from "@mui/material";
 
 export default function CommentInput(
-  props: Readonly<{ onSend: (value: string) => void }>
+  props: Readonly<{
+    onSend: (value: string) => void;
+    onHeightChange?: (height: number) => void;
+  }>
 ) {
-  const { onSend } = props;
+  const { onSend, onHeightChange } = props;
   const spanElement = useRef<HTMLSpanElement>(null);
   const spanDefaultHeight = spanElement.current?.offsetHeight;
+  onHeightChange && onHeightChange(spanDefaultHeight ?? 0);
 
   const onSpanInput = (e: React.FormEvent<HTMLSpanElement>) => {
-    const spanTarget = e.currentTarget;
-    const spanHeight = spanTarget.offsetHeight;
-    if (spanDefaultHeight) {
-      spanTarget.style.top = `-${spanHeight - spanDefaultHeight}px`;
+    if (onHeightChange) {
+      const spanTarget = e.currentTarget;
+      onHeightChange(spanTarget.offsetHeight);
     }
   };
 
@@ -28,7 +31,6 @@ export default function CommentInput(
     if (spanElement.current) {
       onSend(spanElement.current.innerText);
       spanElement.current.textContent = "";
-      spanElement.current.style.top = "0px";
     }
   };
 

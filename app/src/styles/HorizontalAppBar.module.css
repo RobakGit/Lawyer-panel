@@ -6,4 +6,5 @@
     background: var(--primary-color);
     padding: 1rem;
     color: var(--light-background);
+    height: 3vh;
 }

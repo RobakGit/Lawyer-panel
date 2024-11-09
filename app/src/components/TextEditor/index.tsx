@@ -1,12 +1,16 @@
 import { ContentState, Editor, EditorState, convertToRaw } from "draft-js";
 // import "draft-js/dist/Draft.css";
 import styles from "@/styles/TextEditor.module.css";
-import { Component, createRef } from "react";
+import { Component, createRef, CSSProperties } from "react";
 import ToolsContainer from "./ToolsContainer";
 import { stateToHTML } from "draft-js-export-html";
 import { stateFromHTML } from "draft-js-import-html";
 
-type Props = { content: string; save: (content: string) => void };
+type Props = {
+  content: string;
+  save: (content: string) => void;
+  style?: CSSProperties;
+};
 
 type State = { editorState: EditorState };
 
@@ -79,7 +83,11 @@ export default class TextEditor extends Component<Props, State> {
 
   render() {
     return (
-      <div className={styles.editorContainer} ref={this.editorContainerRef}>
+      <div
+        className={styles.editorContainer}
+        ref={this.editorContainerRef}
+        style={this.props.style}
+      >
         <ToolsContainer
           editorState={this.state.editorState}
           onChange={this.onChange}

@@ -163,13 +163,6 @@ export default function CaseHeaderPanel(
             selectOption={selectOpponent}
             createNewOption={createNewOpponent}
           />
-          <div>
-            Status:{" "}
-            <StatusSelector
-              statusValue={statusValue}
-              onStatusChange={onStatusChange}
-            />
-          </div>
         </div>
         <div className={styles.rightSide}>
           <div>
@@ -182,8 +175,15 @@ export default function CaseHeaderPanel(
             />
           </div>
           <p>
-            Najbliższe wydarzenie: <i>{nextEvent}</i>
+            Najbliższe wydarzenie: <i>{nextEvent ?? "Brak"}</i>
           </p>
+          <div>
+            Status:{" "}
+            <StatusSelector
+              statusValue={statusValue}
+              onStatusChange={onStatusChange}
+            />
+          </div>
         </div>
       </div>
     </div>

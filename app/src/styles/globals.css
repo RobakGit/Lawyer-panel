@@ -3,7 +3,7 @@
 :root {
   --primary-color: #0070f3;
   --secondary-color: #ff0080;
-  --light-background: #f5f5f5;
+  --light-background: #f9f9f9;
   --dark-background: #333;
 }
 
@@ -11,4 +11,5 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'DM Sans', sans-serif;
+  background-color: var(--light-background);
 }
