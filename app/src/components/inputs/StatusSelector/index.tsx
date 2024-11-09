@@ -1,21 +1,50 @@
-import styles from "@/styles/StatusSelector.module.css";
 import { useRef, useState } from "react";
 import SelectMenuList from "../SelectMenuList";
 import { CaseStatus } from "@prisma/client";
+import { Chip, colors, useTheme } from "@mui/material";
 
 export default function StatusSelector(props: {
   statusValue: string;
   onStatusChange: (newStatus: CaseStatus) => void;
 }) {
+  const theme = useTheme();
   const { statusValue, onStatusChange } = props;
   const statusRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const statuses = [
-    { enum: "waiting", displayName: "Oczekuje" },
-    { enum: "inProgress", displayName: "W trakcie" },
-    { enum: "done", displayName: "Zakończona" },
+  const statuses: {
+    enum: string;
+    displayName: string;
+    color:
+      | "default"
+      | "primary"
+      | "secondary"
+      | "error"
+      | "info"
+      | "success"
+      | "warning";
+    sx: { color: string };
+  }[] = [
+    {
+      enum: "waiting",
+      displayName: "Oczekuje",
+      color: "info",
+      sx: { color: theme.palette.info.main },
+    },
+    {
+      enum: "inProgress",
+      displayName: "W trakcie",
+      color: "success",
+      sx: { color: theme.palette.success.main },
+    },
+    {
+      enum: "done",
+      displayName: "Zakończona",
+      color: "default",
+      sx: { color: theme.palette.text.primary },
+    },
   ];
+  const actualStatus = statuses.find((status) => status.enum === statusValue);
 
   const onSelect = (index: number) => {
     onStatusChange(statuses[index].enum as CaseStatus);
@@ -39,22 +68,22 @@ export default function StatusSelector(props: {
 
   return (
     <>
-      <div
+      <Chip
         ref={statusRef}
-        className={styles.statusSelector}
+        variant="outlined"
+        label={actualStatus?.displayName}
+        color={actualStatus?.color}
         onClick={(e) => {
           onClick(e, true);
         }}
-      >
-        {statuses.find((status) => status.enum === statusValue)?.displayName}
-      </div>
+      />
       <SelectMenuList
         anchorEl={statusRef?.current}
         isMenuOpen={isMenuOpen}
         onClose={(e) => onClick(e, false)}
         onClick={(e, index) => onClick(e, index)}
         menuElements={statuses.map((status) => {
-          return { text: status.displayName };
+          return { text: status.displayName, sx: status.sx };
         })}
       />
     </>

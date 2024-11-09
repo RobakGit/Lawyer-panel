@@ -3,10 +3,10 @@ import { AvatarGroup } from "@mui/material";
 import { forwardRef } from "react";
 import UserAvatar from "./UserAvatar";
 
-export default forwardRef(function CooperatorsAvatars(
+export default forwardRef<HTMLDivElement, any>(function CooperatorsAvatars(
   props: Readonly<{
     cooperators: UserType[];
-    onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
     inline?: boolean;
   }>,
   ref

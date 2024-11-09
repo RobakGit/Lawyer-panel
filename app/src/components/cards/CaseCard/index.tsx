@@ -1,81 +1,101 @@
-import uniqolor from "uniqolor";
 import styles from "@/styles/CaseCard.module.css";
-import StatusSelector from "@/components/inputs/StatusSelector";
 import { ClientOrOpponentType, UserType } from "@/types/case";
 import CooperatorsSelector from "@/components/inputs/CooperatorsSelector";
-import { CaseStatus } from "@prisma/client";
+import { Box, Card, CardActions, CardContent, Typography } from "@mui/material";
 
-export default function CaseCard(
-  props: Readonly<{
-    uid: string;
-    date: Date;
-    title: string;
-    destination: string | null;
-    client: ClientOrOpponentType | null;
-    opponent: ClientOrOpponentType | null;
-    description: string | null;
-    status: string;
-    cooperators: UserType[];
-    allUsers: UserType[];
-    onStatusChange: (uid: string, newStatus: CaseStatus) => void;
-    onUserClick: (uid: string, user: UserType) => void;
-    nextEvent?: string;
-  }>
-) {
-  const {
-    uid,
-    date,
-    title,
-    destination,
-    client,
-    opponent,
-    description,
-    status,
-    cooperators,
-    allUsers,
-    onStatusChange,
-    onUserClick,
-    nextEvent,
-  } = props;
+export interface CaseCardProps {
+  uid: string;
+  date: Date;
+  title: string;
+  destination: string | null;
+  client: ClientOrOpponentType | null;
+  opponent: ClientOrOpponentType | null;
+  description: string | null;
+  cooperators: UserType[];
+  allUsers: UserType[];
+  onUserClick: (uid: string, user: UserType) => void;
+}
 
+export default function CaseCard({
+  uid,
+  date,
+  title,
+  destination,
+  client,
+  opponent,
+  description,
+  cooperators,
+  allUsers,
+  onUserClick,
+}: CaseCardProps) {
   return (
-    <div
+    <Card
       className={styles.container}
-      style={{
-        backgroundColor:
-          // kolor będzie z uid
-          uniqolor(uid, {
-            saturation: 30,
-            lightness: [70, 92],
-            differencePoint: 40,
-          }).color + "5A",
-      }}
+      variant="outlined"
       onClick={() => (window.location.href = `/case/${uid}`)}
     >
-      <div className={styles.date}>{date.toLocaleDateString()}</div>
-      <div className={styles.title}>{title}</div>
-      <div className={styles.destination}>{destination}</div>
-      <div className={styles.description}>{description}</div>
-      <div className={styles.status}>
-        <StatusSelector
-          statusValue={status}
-          onStatusChange={(status) => onStatusChange(uid, status)}
-        />
-      </div>
-      <div className={styles.footerSection}>
-        <div className={styles.cooperators}>
+      <CardContent>
+        <Typography component="h6" variant="h6" fontWeight={600}>
+          {title}
+        </Typography>
+        <Typography
+          component="p"
+          variant="subtitle2"
+          gutterBottom
+          sx={{ color: "text.secondary" }}
+        >
+          {destination}
+        </Typography>
+        <Typography component="p" variant="body2" gutterBottom>
+          {description}
+        </Typography>
+        <Box
+          sx={{
+            marginTop: 2,
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography
+            component="p"
+            variant="subtitle2"
+            gutterBottom
+            sx={{ color: "text.secondary" }}
+          >
+            {opponent?.displayName}
+          </Typography>
+          <Typography
+            component="p"
+            variant="subtitle2"
+            gutterBottom
+            sx={{ color: "text.secondary" }}
+          >
+            {client?.displayName}
+          </Typography>
+        </Box>
+      </CardContent>
+      <CardActions>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            width: "90%",
+            margin: "0 auto",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography component="p" variant="body2" gutterBottom>
+            {date.toLocaleDateString()}
+          </Typography>
           <CooperatorsSelector
             cooperators={cooperators}
             allUsers={allUsers}
             onUserClick={(user) => onUserClick(uid, user)}
           />
-        </div>
-        <div className={styles.event}>
-          <div className={styles.client}>{client?.displayName}</div>
-          <div className={styles.opponent}>{opponent?.displayName}</div>
-          {nextEvent}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </CardActions>
+    </Card>
   );
 }

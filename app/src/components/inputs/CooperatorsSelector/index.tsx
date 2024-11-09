@@ -12,7 +12,7 @@ export default function CooperatorsSelector(props: {
 }) {
   const { cooperators, allUsers, inline, onUserClick } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const cooperatorsRef = useRef<HTMLElement>(null);
+  const cooperatorsRef = useRef<HTMLDivElement>(null);
 
   const onClick = (
     e: React.MouseEvent<HTMLElement>,
@@ -35,7 +35,7 @@ export default function CooperatorsSelector(props: {
         ref={cooperatorsRef}
         cooperators={cooperators}
         inline={inline}
-        onClick={(e) => onClick(e, true)}
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => onClick(e, true)}
       />
       {cooperatorsRef && (
         <SelectMenuList
