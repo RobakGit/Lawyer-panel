@@ -72,6 +72,7 @@ export class FileRepository extends BaseRepository {
     return this.prisma.file.findMany({
       where: { directory: { uid: parentUid }, status: FileStatus.active },
       select: { uid: true, name: true, isDirectory: true },
+      orderBy: [{ isDirectory: "asc" }, { name: "asc" }],
     });
   }
 

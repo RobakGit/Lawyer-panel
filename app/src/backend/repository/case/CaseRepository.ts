@@ -1,4 +1,8 @@
-import { CaseBackendPrismaSelect } from "@/types/case";
+import {
+  CaseBackendPrismaResult,
+  CaseBackendPrismaSelect,
+  CaseBackendPrismaSelectWithFilesOrderBy,
+} from "@/types/case";
 import { BaseRepository } from "../BaseRepository";
 import { Prisma } from "@prisma/client";
 
@@ -15,11 +19,11 @@ export class CaseRepository extends BaseRepository {
     });
   }
 
-  async findCaseByUid(uid: string) {
+  async findCaseByUid(uid: string): Promise<CaseBackendPrismaResult> {
     return this.prisma.case.findUnique({
       where: { uid },
-      select: CaseBackendPrismaSelect,
-    });
+      select: CaseBackendPrismaSelectWithFilesOrderBy,
+    }) as unknown as Promise<CaseBackendPrismaResult>;
   }
 
   async findUsersAssignedToCase(uid: string) {

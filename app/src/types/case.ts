@@ -1,4 +1,4 @@
-import { CaseStatus, FileStatus } from "@prisma/client";
+import { CaseStatus, FileStatus, Prisma } from "@prisma/client";
 
 export type UserType = {
   uid: string;
@@ -102,5 +102,17 @@ export const CaseBackendPrismaSelect = {
     },
   },
 };
+
+export const CaseBackendPrismaSelectWithFilesOrderBy: Prisma.CaseSelect = {
+  ...CaseBackendPrismaSelect,
+  files: {
+    ...CaseBackendPrismaSelect.files,
+    orderBy: [{ isDirectory: "asc" }, { name: "asc" }],
+  },
+};
+
+export type CaseBackendPrismaResult = Prisma.CaseGetPayload<{
+  select: typeof CaseBackendPrismaSelect;
+}>;
 
 export type CaseDetailsType = CaseBackendType & {};
