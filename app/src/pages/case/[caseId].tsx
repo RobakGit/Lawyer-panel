@@ -15,6 +15,7 @@ export default function CaseContainer() {
   const [description, setDescription] = useState<string | null>("");
   const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
   const [files, setFiles] = useState<FileType[]>([]);
+  const [directory, setDirectory] = useState<FileType | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const caseId = useRef<string>("");
 
@@ -63,6 +64,9 @@ export default function CaseContainer() {
     const formData = new FormData();
     uploadedFiles.forEach((file) => {
       formData.append("files", file);
+      if (directory) {
+        formData.append("parentUid", directory.uid);
+      }
     });
     axios
       .post(`/api/case/${caseId.current}/file`, formData, {
@@ -79,6 +83,9 @@ export default function CaseContainer() {
   const createDirectory = async () => {
     const formData = new FormData();
     formData.append("directory", "Nowy Folder");
+    if (directory) {
+      formData.append("parentUid", directory.uid);
+    }
     axios
       .post(`/api/case/${caseId.current}/file`, formData)
       .then((response) => {
@@ -105,6 +112,35 @@ export default function CaseContainer() {
     );
     if (response.status === 200) {
       setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== uid));
+    }
+  };
+
+  const changeParent = async (fileUid: string, newParentUid: string) => {
+    const response = await axios.put(
+      `/api/case/${caseId.current}/file/${fileUid}`,
+      {
+        parentUid: newParentUid,
+      }
+    );
+    if (response.status === 200) {
+      setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== fileUid));
+    }
+  };
+
+  const openDirectory = async (uid: string | null) => {
+    if (!uid) {
+      const actualCaseId = router.query.caseId;
+      const response = await axios.get(`/api/case/${actualCaseId}`);
+      if (response.status === 200) {
+        setFiles(response.data.files);
+        setDirectory(null);
+      }
+      return;
+    }
+    const response = await axios.get(`/api/case/${caseId.current}/file/${uid}`);
+    if (response.status === 200) {
+      setFiles(response.data.files);
+      setDirectory(response.data.parent);
     }
   };
 
@@ -157,10 +193,13 @@ export default function CaseContainer() {
         <Grid marginTop={"auto"}>
           <FilesPanelWithUploader
             files={files}
+            directory={directory}
             uploadFiles={uploadFiles}
             onDownload={downloadFile}
             onDelete={deleteFile}
             onNewDirectory={createDirectory}
+            onChangeParent={changeParent}
+            onOpenDirectory={openDirectory}
           />
         </Grid>
       </Grid>

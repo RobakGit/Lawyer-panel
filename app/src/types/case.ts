@@ -32,6 +32,9 @@ export type File = {
   uid: string;
   name: string;
   isDirectory: boolean;
+  directory?: {
+    uid?: string;
+  };
 };
 
 export type CaseBackendType = {
@@ -91,7 +94,7 @@ export const CaseBackendPrismaSelect = {
     },
   },
   files: {
-    where: { status: FileStatus.active },
+    where: { status: FileStatus.active, parentDirectory: null },
     select: {
       uid: true,
       name: true,

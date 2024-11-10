@@ -43,6 +43,15 @@ export default class FileApiController extends BaseApiController {
           filesData.push(newFile);
         }
       }
+      if (fields.parentUid) {
+        const parentUid = fields.parentUid[0];
+        const updatedFiles = [];
+        for await (const file of filesData) {
+          await fileRepository.changeParent(file.uid, parentUid);
+          updatedFiles.push(file);
+        }
+        filesData = updatedFiles;
+      }
 
       this.responseOK({ filesData });
     });

@@ -8,6 +8,7 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
   padding: 1rem;
   word-break: break-all;
+  box-sizing: border-box;
 }
 
 .fileCard:hover {
@@ -18,6 +19,7 @@
   width: 50%;
   height: 100%;
   object-fit: contain;
+  padding: 1rem;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;

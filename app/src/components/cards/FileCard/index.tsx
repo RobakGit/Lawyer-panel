@@ -30,19 +30,22 @@ const filenameLimit = 30;
 
 export default function FileCard(
   props: Readonly<{
-    uid: string;
+    uid: string | null;
     filename: string;
     isDirectory: boolean;
     onDownload: (uid: string) => void;
     onDelete: (uid: string) => void;
+    onOpenDirectory: (uid: string | null) => void;
   }>
 ) {
-  const { uid, filename, isDirectory, onDownload, onDelete } = props;
+  const { uid, filename, isDirectory, onDownload, onDelete, onOpenDirectory } =
+    props;
   const fileExtension = filename.split(".").pop();
   const [moreIconRef, setMoreIconRef] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(moreIconRef);
 
   const iconsWithAlt = {
+    returnDir: { icon: "/exit-folder-icon.svg", alt: "exit folder" },
     dir: { icon: "/folder-icon.svg", alt: "folder icon" },
     pdf: { icon: "/pdf-icon.svg", alt: "pdf icon" },
     doc: { icon: "/doc-icon.svg", alt: "doc icon" },
@@ -51,7 +54,11 @@ export default function FileCard(
 
   const getFileIconData = (extension?: string) => {
     if (isDirectory) {
-      return iconsWithAlt.dir;
+      if (filename === "..") {
+        return iconsWithAlt.returnDir;
+      } else {
+        return iconsWithAlt.dir;
+      }
     } else if (extension?.includes("pdf")) {
       return iconsWithAlt.pdf;
     } else if (extension?.includes("doc")) {
@@ -67,27 +74,41 @@ export default function FileCard(
     _e: React.MouseEvent<HTMLElement>,
     index: number
   ) => {
+    if (!uid) return;
     const action = selectMenuList[index].actionName;
     if (action === "view") {
-      isDirectory ? console.log("open dir") : console.log("viewing file");
+      if (isDirectory) {
+        onOpenDirectory(uid);
+      } else {
+        console.log("viewing file");
+      }
     }
     if (action === "download") {
       onDownload(uid);
     }
     if (action === "delete") {
-      console.log("deleting file");
       onDelete(uid);
     }
   };
 
+  const onDoubleClick = () => {
+    if (isDirectory) {
+      onOpenDirectory(uid);
+    } else {
+      console.log("viewing file");
+    }
+  };
+
   return (
-    <div className={styles.fileCard}>
-      <MoreVertIcon
-        onClick={(e) =>
-          setMoreIconRef(e.currentTarget as unknown as HTMLElement)
-        }
-        className={styles.moreIcon}
-      />
+    <div className={styles.fileCard} onDoubleClick={onDoubleClick}>
+      {uid && (
+        <MoreVertIcon
+          onClick={(e) =>
+            setMoreIconRef(e.currentTarget as unknown as HTMLElement)
+          }
+          className={styles.moreIcon}
+        />
+      )}
       <SelectMenuList
         anchorEl={moreIconRef}
         isMenuOpen={isMenuOpen}

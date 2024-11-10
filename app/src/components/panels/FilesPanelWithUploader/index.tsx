@@ -1,21 +1,33 @@
 import styles from "@/styles/FilesPanelWithUploader.module.css";
-import FileCard from "../../cards/FileCard";
 import { Button } from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import { File as FileType } from "@/types/case";
 import { useState } from "react";
 import FilesContextMenu from "@/components/inputs/FilesContextMenu";
+import { FilesGrid } from "@/components/dragAndDrop/FilesGrid";
 
 export default function FilesPanelWithUploader(
   props: Readonly<{
     files: FileType[];
+    directory: FileType | null;
     uploadFiles: (files: File[]) => void;
     onDownload?: (uid: string) => void;
     onDelete?: (uid: string) => void;
     onNewDirectory?: () => void;
+    onChangeParent?: (fileUid: string, newParentUid: string) => void;
+    onOpenDirectory?: (uid: string | null) => void;
   }>
 ) {
-  const { files, uploadFiles, onDownload, onDelete, onNewDirectory } = props;
+  const {
+    files,
+    directory,
+    uploadFiles,
+    onDownload,
+    onDelete,
+    onNewDirectory,
+    onChangeParent,
+    onOpenDirectory,
+  } = props;
 
   const [fileConentMenuPosition, setFileContentMenuPosition] = useState<
     | {
@@ -43,6 +55,16 @@ export default function FilesPanelWithUploader(
     return;
   };
 
+  const changeParent = (fileUid: string, newParentUid: string) => {
+    onChangeParent && onChangeParent(fileUid, newParentUid);
+    return;
+  };
+
+  const openDirectory = (uid: string | null) => {
+    onOpenDirectory && onOpenDirectory(uid);
+    return;
+  };
+
   const newDirectory = () => {
     onNewDirectory && onNewDirectory();
     return;
@@ -65,19 +87,17 @@ export default function FilesPanelWithUploader(
     >
       <h3>Pliki:</h3>
       <div
-        className={styles.filesGridContainer}
+        style={{ minHeight: "100px" }}
         onContextMenu={FileGridHandleContextMenu}
       >
-        {files.map((file) => (
-          <FileCard
-            key={file.uid}
-            uid={file.uid}
-            filename={file.name}
-            isDirectory={file.isDirectory}
-            onDownload={download}
-            onDelete={deleteFile}
-          />
-        ))}
+        <FilesGrid
+          files={files}
+          directory={directory}
+          onDownload={download}
+          onDelete={deleteFile}
+          onChangeParent={changeParent}
+          onOpenDirectory={openDirectory}
+        />
         <FilesContextMenu
           anchorPosition={fileConentMenuPosition}
           onClose={() => setFileContentMenuPosition(undefined)}
