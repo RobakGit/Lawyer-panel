@@ -28,6 +28,7 @@ export default function OutOfParentDroppable({
         onDownload={() => {}}
         onDelete={() => {}}
         onOpenDirectory={onOpenDirectory}
+        onFileView={() => {}}
       />
     </Grid>
   );

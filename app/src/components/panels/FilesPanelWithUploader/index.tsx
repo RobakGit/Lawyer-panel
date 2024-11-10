@@ -16,6 +16,7 @@ export default function FilesPanelWithUploader(
     onNewDirectory?: () => void;
     onChangeParent?: (fileUid: string, newParentUid: string) => void;
     onOpenDirectory?: (uid: string | null) => void;
+    onFileView?: (uid: string) => void;
   }>
 ) {
   const {
@@ -27,6 +28,7 @@ export default function FilesPanelWithUploader(
     onNewDirectory,
     onChangeParent,
     onOpenDirectory,
+    onFileView,
   } = props;
 
   const [fileConentMenuPosition, setFileContentMenuPosition] = useState<
@@ -70,6 +72,11 @@ export default function FilesPanelWithUploader(
     return;
   };
 
+  const viewFile = (uid: string) => {
+    onFileView && onFileView(uid);
+    return;
+  };
+
   const FileGridHandleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     setFileContentMenuPosition({ top: e.clientY, left: e.clientX });
@@ -97,6 +104,7 @@ export default function FilesPanelWithUploader(
           onDelete={deleteFile}
           onChangeParent={changeParent}
           onOpenDirectory={openDirectory}
+          onFileView={viewFile}
         />
         <FilesContextMenu
           anchorPosition={fileConentMenuPosition}

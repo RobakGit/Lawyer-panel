@@ -25,6 +25,7 @@ interface FilesGridProps {
   onDelete: (uid: string) => void;
   onChangeParent: (fileUid: string, newParentUid: string) => void;
   onOpenDirectory: (uid: string | null) => void;
+  onFileView: (uid: string) => void;
 }
 
 export interface ActuallyDraggingFile extends FileType {
@@ -38,6 +39,7 @@ export function FilesGrid({
   onDelete,
   onChangeParent,
   onOpenDirectory,
+  onFileView,
 }: FilesGridProps) {
   const filesUid = useMemo(() => files.map((file) => file.uid), [files]);
   const [actuallyDragging, setActuallyDragging] =
@@ -93,6 +95,7 @@ export function FilesGrid({
                 onDelete={() => {}}
                 onDownload={() => {}}
                 onOpenDirectory={() => {}}
+                onFileView={() => {}}
               />
             )}
           </DragOverlay>,
@@ -113,6 +116,7 @@ export function FilesGrid({
               onDownload={onDownload}
               onDelete={onDelete}
               onOpenDirectory={onOpenDirectory}
+              onFileView={onFileView}
             />
           ))}
         </SortableContext>

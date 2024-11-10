@@ -36,10 +36,18 @@ export default function FileCard(
     onDownload: (uid: string) => void;
     onDelete: (uid: string) => void;
     onOpenDirectory: (uid: string | null) => void;
+    onFileView: (uid: string) => void;
   }>
 ) {
-  const { uid, filename, isDirectory, onDownload, onDelete, onOpenDirectory } =
-    props;
+  const {
+    uid,
+    filename,
+    isDirectory,
+    onDownload,
+    onDelete,
+    onOpenDirectory,
+    onFileView,
+  } = props;
   const fileExtension = filename.split(".").pop();
   const [moreIconRef, setMoreIconRef] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(moreIconRef);
@@ -80,7 +88,7 @@ export default function FileCard(
       if (isDirectory) {
         onOpenDirectory(uid);
       } else {
-        console.log("viewing file");
+        onFileView(uid);
       }
     }
     if (action === "download") {
@@ -95,7 +103,7 @@ export default function FileCard(
     if (isDirectory) {
       onOpenDirectory(uid);
     } else {
-      console.log("viewing file");
+      if (uid) onFileView(uid);
     }
   };
 

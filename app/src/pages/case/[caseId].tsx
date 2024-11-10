@@ -200,6 +200,7 @@ export default function CaseContainer() {
             onNewDirectory={createDirectory}
             onChangeParent={changeParent}
             onOpenDirectory={openDirectory}
+            onFileView={downloadFile}
           />
         </Grid>
       </Grid>

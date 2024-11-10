@@ -70,7 +70,7 @@ export class FileRepository extends BaseRepository {
 
   async findFilesByParent(parentUid: string) {
     return this.prisma.file.findMany({
-      where: { directory: { uid: parentUid } },
+      where: { directory: { uid: parentUid }, status: FileStatus.active },
       select: { uid: true, name: true, isDirectory: true },
     });
   }
