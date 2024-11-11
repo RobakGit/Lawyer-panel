@@ -7,7 +7,7 @@ import { Comment } from "@/types/case";
 
 export default function CaseActivityContainer(props: {
   comments: Comment[];
-  sendComment: (comment: string) => Promise<Comment>;
+  sendComment: (comment: string) => Promise<Comment | null>;
 }) {
   const { comments, sendComment } = props;
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -23,6 +23,7 @@ export default function CaseActivityContainer(props: {
 
   const addComment = async (comment: string) => {
     const newComment = await sendComment(comment);
+    if (!newComment) return;
     setActivities((prev: Activity[]) => [
       ...prev,
       { ...newComment, type: "comment" },

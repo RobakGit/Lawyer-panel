@@ -1,3 +1,7 @@
+import CustomAlert, {
+  AlertData,
+  alertOnCatchRequest,
+} from "@/components/Alert";
 import AutoCompleteInput from "@/components/inputs/AutoCompleteInput";
 import CooperatorsSelector from "@/components/inputs/CooperatorsSelector";
 import StatusSelector from "@/components/inputs/StatusSelector";
@@ -29,7 +33,7 @@ export default function CaseHeaderPanel(
       status?: string;
       cooperator?: UserType;
       description?: string;
-    }) => Promise<AxiosResponse>;
+    }) => Promise<AxiosResponse | null>;
   }>
 ) {
   const {
@@ -52,6 +56,7 @@ export default function CaseHeaderPanel(
   const [cooperatorsValue, setCooperatorsValue] = useState(cooperators);
   const [allClients, setAllClients] = useState<ClientOrOpponentType[]>([]);
   const [allOpponents, setAllOpponents] = useState<ClientOrOpponentType[]>([]);
+  const [alert, setAlert] = useState<AlertData | null>(null);
 
   useEffect(() => {
     axios.get("/api/client").then((response) => {
@@ -98,19 +103,34 @@ export default function CaseHeaderPanel(
 
   const onUserClick = async (user: UserType) => {
     const response = await updateCaseData({ cooperator: user });
+    if (!response) return;
     setCooperatorsValue(response.data.users);
   };
 
   const createNewClient = async (data: ClientOrOpponentPayloadType) => {
-    const response = await axios.post("/api/client", data);
-    setAllClients((prev) => [...prev, response.data]);
-    return response.data.uid;
+    return axios
+      .post("/api/client", data)
+      .then((response) => {
+        setAllClients((prev) => [...prev, response.data]);
+        return response.data.uid;
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+        return null;
+      });
   };
 
   const createNewOpponent = async (data: ClientOrOpponentPayloadType) => {
-    const response = await axios.post("/api/opponent", data);
-    setAllOpponents((prev) => [...prev, response.data]);
-    return response.data.uid;
+    return axios
+      .post("/api/opponent", data)
+      .then((response) => {
+        setAllOpponents((prev) => [...prev, response.data]);
+        return response.data.uid;
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+        return null;
+      });
   };
 
   const selectClient = async (value: string) => {
@@ -186,6 +206,7 @@ export default function CaseHeaderPanel(
           </div>
         </div>
       </div>
+      {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
     </div>
   );
 }

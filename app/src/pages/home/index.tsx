@@ -4,7 +4,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import styles from "@/styles/Home.module.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { CaseBackendType, ClientOrOpponentType, UserType } from "@/types/case";
 import DOMPurify from "isomorphic-dompurify";
 import HomeDataGrid from "@/components/dataGrids/HomeDataGrid/HomeDataGrid";
@@ -13,6 +13,10 @@ import HomeFilterPanel from "@/components/panels/HomeFilterPanel/HomeFilterPanel
 import { KanbanGrid } from "@/components/dragAndDrop/KanbanGrid";
 import { Add, Notifications } from "@mui/icons-material";
 import NotificationsPanel from "@/components/panels/NotificationsPanel";
+import CustomAlert, {
+  AlertData,
+  alertOnCatchRequest,
+} from "@/components/Alert";
 
 export default function Home() {
   const [cases, setCases] = useState<CaseBackendType[]>([]);
@@ -27,6 +31,7 @@ export default function Home() {
     new: 0,
   });
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
+  const [alert, setAlert] = useState<AlertData | null>(null);
   const panelTransition = "all .2s ease-in-out";
 
   useEffect(() => {
@@ -61,10 +66,15 @@ export default function Home() {
 
   const [listType, setListType] = useState<"list" | "grid">("grid");
 
-  const createNewCase = () => {
-    axios.post("/api/case").then((response) => {
-      window.location.href = `/case/${response.data.uid}`;
-    });
+  const createNewCase = async () => {
+    axios
+      .post("/api/case")
+      .then((response) => {
+        window.location.href = `/case/${response.data.uid}`;
+      })
+      .catch((error: AxiosError<{ message: string }>) => {
+        alertOnCatchRequest(error, setAlert);
+      });
   };
 
   const clearHTMLTagsAndLimit = (text: string | null) => {
@@ -78,23 +88,35 @@ export default function Home() {
   };
 
   const changeStatus = async (uid: string, newStatus: CaseStatus) => {
-    await axios.put(`/api/case/${uid}`, { status: newStatus });
-    setCases(
-      cases.map((caseItem) =>
-        caseItem.uid === uid ? { ...caseItem, status: newStatus } : caseItem
-      )
-    );
+    axios
+      .put(`/api/case/${uid}`, { status: newStatus })
+      .then(() => {
+        setCases(
+          cases.map((caseItem) =>
+            caseItem.uid === uid ? { ...caseItem, status: newStatus } : caseItem
+          )
+        );
+      })
+      .catch((error: AxiosError<{ message: string }>) => {
+        alertOnCatchRequest(error, setAlert);
+      });
   };
 
   const changeUsers = async (uid: string, user: UserType) => {
-    const response = await axios.put(`/api/case/${uid}`, { cooperator: user });
-    setCases(
-      cases.map((caseItem) =>
-        caseItem.uid === uid
-          ? { ...caseItem, users: response.data.users }
-          : caseItem
-      )
-    );
+    axios
+      .put(`/api/case/${uid}`, { cooperator: user })
+      .then((response) => {
+        setCases(
+          cases.map((caseItem) =>
+            caseItem.uid === uid
+              ? { ...caseItem, users: response.data.users }
+              : caseItem
+          )
+        );
+      })
+      .catch((error: AxiosError<{ message: string }>) => {
+        alertOnCatchRequest(error, setAlert);
+      });
   };
 
   const getViewIconClass = (type: "list" | "grid") => {
@@ -202,6 +224,7 @@ export default function Home() {
           />
         </div>
       </Grid>
+      {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
     </Grid>
   );
 }

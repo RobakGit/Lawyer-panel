@@ -5,9 +5,13 @@ import CaseActivityContainer from "@/containers/CaseActivityContainer";
 import { Grid2 as Grid } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useRouter } from "next/router";
 import { CaseDetailsType, File as FileType, UserType } from "@/types/case";
+import CustomAlert, {
+  AlertData,
+  alertOnCatchRequest,
+} from "@/components/Alert";
 
 export default function CaseContainer() {
   const router = useRouter();
@@ -17,6 +21,7 @@ export default function CaseContainer() {
   const [files, setFiles] = useState<FileType[]>([]);
   const [directory, setDirectory] = useState<FileType | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
+  const [alert, setAlert] = useState<AlertData | null>(null);
   const caseId = useRef<string>("");
 
   useEffect(() => {
@@ -50,14 +55,26 @@ export default function CaseContainer() {
     cooperator?: UserType;
     description?: string;
   }) => {
-    return await axios.put(`/api/case/${caseId.current}`, data);
+    return await axios
+      .put(`/api/case/${caseId.current}`, data)
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+        return null;
+      });
   };
 
   const sendComment = async (content: string) => {
-    const newComment = await axios.post(`/api/comment/${caseId.current}`, {
-      content: content,
-    });
-    return newComment.data.comment;
+    return axios
+      .post(`/api/comment/${caseId.current}`, {
+        content: content,
+      })
+      .then((response) => {
+        return response.data.comment;
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+        return null;
+      });
   };
 
   const uploadFiles = async (uploadedFiles: File[]) => {
@@ -77,6 +94,9 @@ export default function CaseContainer() {
       .then((response) => {
         const filesData = response.data.filesData;
         setFiles((prevFiles) => [...prevFiles, ...filesData]);
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
       });
   };
 
@@ -91,6 +111,9 @@ export default function CaseContainer() {
       .then((response) => {
         const filesData = response.data.filesData;
         setFiles((prevFiles) => [...prevFiles, ...filesData]);
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
       });
   };
 
@@ -107,24 +130,29 @@ export default function CaseContainer() {
   };
 
   const deleteFile = async (uid: string) => {
-    const response = await axios.delete(
-      `/api/case/${caseId.current}/file/${uid}`
-    );
-    if (response.status === 200) {
-      setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== uid));
-    }
+    axios
+      .delete(`/api/case/${caseId.current}/file/${uid}`)
+      .then(() => {
+        setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== uid));
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+      });
   };
 
   const changeParent = async (fileUid: string, newParentUid: string) => {
-    const response = await axios.put(
-      `/api/case/${caseId.current}/file/${fileUid}`,
-      {
+    axios
+      .put(`/api/case/${caseId.current}/file/${fileUid}`, {
         parentUid: newParentUid,
-      }
-    );
-    if (response.status === 200) {
-      setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== fileUid));
-    }
+      })
+      .then(() => {
+        setFiles((prevFiles) =>
+          prevFiles.filter((file) => file.uid !== fileUid)
+        );
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+      });
   };
 
   const openDirectory = async (uid: string | null) => {
@@ -145,20 +173,20 @@ export default function CaseContainer() {
   };
 
   const changeFileName = async (uid: string, newName: string) => {
-    console.log("changeName", uid, newName);
-    const response = await axios.put(
-      `/api/case/${caseId.current}/file/${uid}`,
-      {
+    axios
+      .put(`/api/case/${caseId.current}/file/${uid}`, {
         filename: newName,
-      }
-    );
-    if (response.status === 200) {
-      setFiles((prevFiles) =>
-        prevFiles.map((file) =>
-          file.uid === uid ? { ...file, name: newName } : file
-        )
-      );
-    }
+      })
+      .then(() => {
+        setFiles((prevFiles) =>
+          prevFiles.map((file) =>
+            file.uid === uid ? { ...file, name: newName } : file
+          )
+        );
+      })
+      .catch((error) => {
+        alertOnCatchRequest(error, setAlert);
+      });
   };
 
   return (
@@ -228,6 +256,7 @@ export default function CaseContainer() {
           sendComment={sendComment}
         />
       </Grid>
+      {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
     </Grid>
   );
 }
