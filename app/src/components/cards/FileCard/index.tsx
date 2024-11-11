@@ -5,7 +5,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useState } from "react";
 import SelectMenuList from "@/components/inputs/SelectMenuList";
-import { DeleteForever } from "@mui/icons-material";
+import { DeleteForever, DriveFileRenameOutline } from "@mui/icons-material";
+import ChangeNameDialog from "./ChangeNameDialog";
 
 const selectMenuList = [
   {
@@ -18,9 +19,20 @@ const selectMenuList = [
   },
   {
     element: {
+      text: "Zmień nazwę",
+      icon: <DriveFileRenameOutline fontSize="small" />,
+    },
+    actionName: "rename",
+  },
+  {
+    element: {
       text: "Usuń",
       icon: <DeleteForever fontSize="small" />,
-      sx: { background: "#ff00003f", "&:hover": { background: "#ff0000af" } },
+      sx: {
+        background: "#ff00003f",
+        marginTop: "1rem",
+        "&:hover": { background: "#ff0000af" },
+      },
     },
     actionName: "delete",
   },
@@ -33,10 +45,11 @@ export default function FileCard(
     uid: string | null;
     filename: string;
     isDirectory: boolean;
-    onDownload: (uid: string) => void;
-    onDelete: (uid: string) => void;
-    onOpenDirectory: (uid: string | null) => void;
-    onFileView: (uid: string) => void;
+    onDownload?: (uid: string) => void;
+    onDelete?: (uid: string) => void;
+    onOpenDirectory?: (uid: string | null) => void;
+    onFileView?: (uid: string) => void;
+    onChangeName?: (uid: string, newName: string) => void;
   }>
 ) {
   const {
@@ -47,10 +60,12 @@ export default function FileCard(
     onDelete,
     onOpenDirectory,
     onFileView,
+    onChangeName,
   } = props;
   const fileExtension = filename.split(".").pop();
   const [moreIconRef, setMoreIconRef] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(moreIconRef);
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 
   const iconsWithAlt = {
     returnDir: { icon: "/exit-folder-icon.svg", alt: "exit folder" },
@@ -78,6 +93,22 @@ export default function FileCard(
     }
   };
 
+  const download = (uid: string) => {
+    onDownload && onDownload(uid);
+  };
+
+  const deleteFile = (uid: string) => {
+    onDelete && onDelete(uid);
+  };
+
+  const openDirectory = (uid: string | null) => {
+    onOpenDirectory && onOpenDirectory(uid);
+  };
+
+  const fileView = (uid: string) => {
+    onFileView && onFileView(uid);
+  };
+
   const onSelectMenuClick = (
     _e: React.MouseEvent<HTMLElement>,
     index: number
@@ -86,56 +117,73 @@ export default function FileCard(
     const action = selectMenuList[index].actionName;
     if (action === "view") {
       if (isDirectory) {
-        onOpenDirectory(uid);
+        openDirectory(uid);
       } else {
-        onFileView(uid);
+        fileView(uid);
       }
     }
     if (action === "download") {
-      onDownload(uid);
+      download(uid);
+    }
+    if (action === "rename") {
+      setIsRenameDialogOpen(true);
     }
     if (action === "delete") {
-      onDelete(uid);
+      deleteFile(uid);
     }
   };
 
   const onDoubleClick = () => {
     if (isDirectory) {
-      onOpenDirectory(uid);
+      openDirectory(uid);
     } else {
-      if (uid) onFileView(uid);
+      if (uid) fileView(uid);
+    }
+  };
+
+  const changeName = (newName: string) => {
+    if (uid && newName && newName !== filename) {
+      onChangeName && onChangeName(uid, newName);
     }
   };
 
   return (
-    <div className={styles.fileCard} onDoubleClick={onDoubleClick}>
-      {uid && (
-        <MoreVertIcon
-          onClick={(e) =>
-            setMoreIconRef(e.currentTarget as unknown as HTMLElement)
-          }
-          className={styles.moreIcon}
+    <>
+      <div className={styles.fileCard} onDoubleClick={onDoubleClick}>
+        {uid && (
+          <MoreVertIcon
+            onClick={(e) =>
+              setMoreIconRef(e.currentTarget as unknown as HTMLElement)
+            }
+            className={styles.moreIcon}
+          />
+        )}
+        <SelectMenuList
+          anchorEl={moreIconRef}
+          isMenuOpen={isMenuOpen}
+          onClose={() => setMoreIconRef(null)}
+          onClick={onSelectMenuClick}
+          menuElements={selectMenuList.map((el) => el.element)}
         />
-      )}
-      <SelectMenuList
-        anchorEl={moreIconRef}
-        isMenuOpen={isMenuOpen}
-        onClose={() => setMoreIconRef(null)}
-        onClick={onSelectMenuClick}
-        menuElements={selectMenuList.map((el) => el.element)}
+        <Image
+          width={60}
+          height={60}
+          src={getFileIconData(fileExtension).icon}
+          alt={getFileIconData(fileExtension).alt}
+          className={styles.fileImage}
+        />
+        <span className={styles.filename}>
+          {filename.length - (fileExtension?.length ?? 0) < filenameLimit
+            ? filename
+            : `${filename.slice(0, filenameLimit)}...${fileExtension}`}
+        </span>
+      </div>
+      <ChangeNameDialog
+        open={isRenameDialogOpen}
+        onClose={() => setIsRenameDialogOpen(false)}
+        filename={filename}
+        changeName={changeName}
       />
-      <Image
-        width={60}
-        height={60}
-        src={getFileIconData(fileExtension).icon}
-        alt={getFileIconData(fileExtension).alt}
-        className={styles.fileImage}
-      />
-      <span className={styles.filename}>
-        {filename.length - (fileExtension?.length ?? 0) < filenameLimit
-          ? filename
-          : `${filename.slice(0, filenameLimit)}...${fileExtension}`}
-      </span>
-    </div>
+    </>
   );
 }

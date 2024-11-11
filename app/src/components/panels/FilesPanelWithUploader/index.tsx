@@ -11,12 +11,13 @@ export default function FilesPanelWithUploader(
     files: FileType[];
     directory: FileType | null;
     uploadFiles: (files: File[]) => void;
-    onDownload?: (uid: string) => void;
-    onDelete?: (uid: string) => void;
-    onNewDirectory?: () => void;
-    onChangeParent?: (fileUid: string, newParentUid: string) => void;
-    onOpenDirectory?: (uid: string | null) => void;
-    onFileView?: (uid: string) => void;
+    onDownload: (uid: string) => void;
+    onDelete: (uid: string) => void;
+    onNewDirectory: () => void;
+    onChangeParent: (fileUid: string, newParentUid: string) => void;
+    onOpenDirectory: (uid: string | null) => void;
+    onFileView: (uid: string) => void;
+    onChangeName: (uid: string, newName: string) => void;
   }>
 ) {
   const {
@@ -29,6 +30,7 @@ export default function FilesPanelWithUploader(
     onChangeParent,
     onOpenDirectory,
     onFileView,
+    onChangeName,
   } = props;
 
   const [fileConentMenuPosition, setFileContentMenuPosition] = useState<
@@ -46,36 +48,6 @@ export default function FilesPanelWithUploader(
     onDrop,
     noClick: true,
   });
-
-  const download = (uid: string) => {
-    onDownload && onDownload(uid);
-    return;
-  };
-
-  const deleteFile = (uid: string) => {
-    onDelete && onDelete(uid);
-    return;
-  };
-
-  const changeParent = (fileUid: string, newParentUid: string) => {
-    onChangeParent && onChangeParent(fileUid, newParentUid);
-    return;
-  };
-
-  const openDirectory = (uid: string | null) => {
-    onOpenDirectory && onOpenDirectory(uid);
-    return;
-  };
-
-  const newDirectory = () => {
-    onNewDirectory && onNewDirectory();
-    return;
-  };
-
-  const viewFile = (uid: string) => {
-    onFileView && onFileView(uid);
-    return;
-  };
 
   const FileGridHandleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -100,16 +72,17 @@ export default function FilesPanelWithUploader(
         <FilesGrid
           files={files}
           directory={directory}
-          onDownload={download}
-          onDelete={deleteFile}
-          onChangeParent={changeParent}
-          onOpenDirectory={openDirectory}
-          onFileView={viewFile}
+          onDownload={onDownload}
+          onDelete={onDelete}
+          onChangeParent={onChangeParent}
+          onOpenDirectory={onOpenDirectory}
+          onFileView={onFileView}
+          onChangeName={onChangeName}
         />
         <FilesContextMenu
           anchorPosition={fileConentMenuPosition}
           onClose={() => setFileContentMenuPosition(undefined)}
-          onNewDirectory={newDirectory}
+          onNewDirectory={onNewDirectory}
         />
       </div>
       <span className={styles.uploadPrompt}>

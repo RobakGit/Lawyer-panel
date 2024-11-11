@@ -144,6 +144,23 @@ export default function CaseContainer() {
     }
   };
 
+  const changeFileName = async (uid: string, newName: string) => {
+    console.log("changeName", uid, newName);
+    const response = await axios.put(
+      `/api/case/${caseId.current}/file/${uid}`,
+      {
+        filename: newName,
+      }
+    );
+    if (response.status === 200) {
+      setFiles((prevFiles) =>
+        prevFiles.map((file) =>
+          file.uid === uid ? { ...file, name: newName } : file
+        )
+      );
+    }
+  };
+
   return (
     <Grid container minHeight="calc(97vh - 2rem)">
       <Grid container size={{ xs: 8 }} direction={"column"} gap={2}>
@@ -201,6 +218,7 @@ export default function CaseContainer() {
             onChangeParent={changeParent}
             onOpenDirectory={openDirectory}
             onFileView={downloadFile}
+            onChangeName={changeFileName}
           />
         </Grid>
       </Grid>

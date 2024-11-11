@@ -16,6 +16,7 @@ interface DraggableFileCardProps {
   onDelete: (uid: string) => void;
   onOpenDirectory: (uid: string | null) => void;
   onFileView: (uid: string) => void;
+  onChangeName: (uid: string, newName: string) => void;
 }
 
 export default function FileCard({
@@ -25,6 +26,7 @@ export default function FileCard({
   onDelete,
   onOpenDirectory,
   onFileView,
+  onChangeName,
 }: DraggableFileCardProps) {
   const sortableData: SortableContext = {
     id: file.uid,
@@ -61,6 +63,7 @@ export default function FileCard({
         onDelete={onDelete}
         onOpenDirectory={onOpenDirectory}
         onFileView={onFileView}
+        onChangeName={onChangeName}
       />
     </Grid>
   );

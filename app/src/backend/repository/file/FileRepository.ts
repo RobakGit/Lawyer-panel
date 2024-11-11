@@ -83,4 +83,12 @@ export class FileRepository extends BaseRepository {
       select: { uid: true, name: true, isDirectory: true },
     });
   }
+
+  async changeName(fileUid: string, newName: string) {
+    return this.prisma.file.update({
+      where: { uid: fileUid },
+      data: { name: newName },
+      select: { uid: true, name: true, isDirectory: true },
+    });
+  }
 }

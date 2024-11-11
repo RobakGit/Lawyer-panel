@@ -25,10 +25,7 @@ export default function OutOfParentDroppable({
         uid={file.directory?.uid ?? null}
         filename=".."
         isDirectory={true}
-        onDownload={() => {}}
-        onDelete={() => {}}
         onOpenDirectory={onOpenDirectory}
-        onFileView={() => {}}
       />
     </Grid>
   );

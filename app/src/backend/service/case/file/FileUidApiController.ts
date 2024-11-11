@@ -41,11 +41,15 @@ export default class FileUidApiController extends BaseApiController {
 
   protected async put(): Promise<void> {
     const fileUid = this.req.query.file as string;
-    const { parentUid } = this.req.body;
+    const { parentUid, filename } = this.req.body;
     let file;
+    if (filename) {
+      file = await this.fileRepository.changeName(fileUid, filename);
+    }
     if (parentUid === null) {
       file = await this.fileRepository.unlinkParentDirectory(fileUid);
-    } else {
+    }
+    if (parentUid && typeof parentUid === "string") {
       file = await this.fileRepository.changeParent(fileUid, parentUid);
     }
     return this.responseOK({ file });
