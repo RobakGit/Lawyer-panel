@@ -155,18 +155,22 @@ model Comment {
 }
 
 model File {
-  id         Int        @id @default(autoincrement())
-  uid        String     @unique @default(uuid()) @db.Uuid
-  name       String
-  path       String
-  caseId     Int        @map("case_id")
-  uploadedBy Int        @map("uploaded_by")
-  status     FileStatus @default(active)
-  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  id              Int        @id @default(autoincrement())
+  uid             String     @unique @default(uuid()) @db.Uuid
+  name            String
+  path            String
+  caseId          Int        @map("case_id")
+  uploadedBy      Int        @map("uploaded_by")
+  status          FileStatus @default(active)
+  isDirectory     Boolean    @default(false) @map("is_directory")
+  parentDirectory Int?       @map("parent_directory")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
-  case Case @relation(fields: [caseId], references: [id])
-  user User @relation(fields: [uploadedBy], references: [id])
+  case      Case   @relation(fields: [caseId], references: [id])
+  user      User   @relation(fields: [uploadedBy], references: [id])
+  directory File?  @relation("ParentDirectory", fields: [parentDirectory], references: [id])
+  childs    File[] @relation("ParentDirectory")
 
   @@map("file")
 }

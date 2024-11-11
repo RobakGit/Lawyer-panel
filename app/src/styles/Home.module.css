@@ -9,3 +9,13 @@
     border-radius: 0.5rem;
     cursor: pointer;
 }
+
+.activeViewIcon {
+    background-color: black;
+    color: white;
+}
+
+.inactiveViewIcon:hover {
+    background-color: grey;
+    color: white;
+}

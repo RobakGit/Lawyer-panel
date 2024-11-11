@@ -1,18 +1,45 @@
 import styles from "@/styles/FilesPanelWithUploader.module.css";
-import FileCard from "../../cards/FileCard";
 import { Button } from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import { File as FileType } from "@/types/case";
+import { useState } from "react";
+import FilesContextMenu from "@/components/inputs/FilesContextMenu";
+import { FilesGrid } from "@/components/dragAndDrop/FilesGrid";
 
 export default function FilesPanelWithUploader(
   props: Readonly<{
     files: FileType[];
+    directory: FileType | null;
     uploadFiles: (files: File[]) => void;
-    onDownload?: (uid: string) => void;
-    onDelete?: (uid: string) => void;
+    onDownload: (uid: string) => void;
+    onDelete: (uid: string) => void;
+    onNewDirectory: () => void;
+    onChangeParent: (fileUid: string, newParentUid: string) => void;
+    onOpenDirectory: (uid: string | null) => void;
+    onFileView: (uid: string) => void;
+    onChangeName: (uid: string, newName: string) => void;
   }>
 ) {
-  const { files, uploadFiles, onDownload, onDelete } = props;
+  const {
+    files,
+    directory,
+    uploadFiles,
+    onDownload,
+    onDelete,
+    onNewDirectory,
+    onChangeParent,
+    onOpenDirectory,
+    onFileView,
+    onChangeName,
+  } = props;
+
+  const [fileConentMenuPosition, setFileContentMenuPosition] = useState<
+    | {
+        top: number;
+        left: number;
+      }
+    | undefined
+  >(undefined);
 
   const onDrop = (acceptedFiles: File[]) => {
     uploadFiles(acceptedFiles);
@@ -22,14 +49,9 @@ export default function FilesPanelWithUploader(
     noClick: true,
   });
 
-  const download = (uid: string) => {
-    onDownload && onDownload(uid);
-    return;
-  };
-
-  const deleteFile = (uid: string) => {
-    onDelete && onDelete(uid);
-    return;
+  const FileGridHandleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setFileContentMenuPosition({ top: e.clientY, left: e.clientX });
   };
 
   return (
@@ -43,16 +65,25 @@ export default function FilesPanelWithUploader(
       }
     >
       <h3>Pliki:</h3>
-      <div className={styles.filesGridContainer}>
-        {files.map((file) => (
-          <FileCard
-            key={file.uid}
-            uid={file.uid}
-            filename={file.name}
-            onDownload={download}
-            onDelete={deleteFile}
-          />
-        ))}
+      <div
+        style={{ minHeight: "100px" }}
+        onContextMenu={FileGridHandleContextMenu}
+      >
+        <FilesGrid
+          files={files}
+          directory={directory}
+          onDownload={onDownload}
+          onDelete={onDelete}
+          onChangeParent={onChangeParent}
+          onOpenDirectory={onOpenDirectory}
+          onFileView={onFileView}
+          onChangeName={onChangeName}
+        />
+        <FilesContextMenu
+          anchorPosition={fileConentMenuPosition}
+          onClose={() => setFileContentMenuPosition(undefined)}
+          onNewDirectory={onNewDirectory}
+        />
       </div>
       <span className={styles.uploadPrompt}>
         Aby dodać plik, przeciągnij go tutaj lub kliknij poniżej

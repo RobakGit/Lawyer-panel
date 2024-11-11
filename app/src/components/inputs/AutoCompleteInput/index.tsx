@@ -11,7 +11,7 @@ import {
   TextField,
   TextareaAutosize,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function AutoCompleteInput(props: {
   label: string;
@@ -95,7 +95,9 @@ export default function AutoCompleteInput(props: {
         getOptionLabel={(option) =>
           typeof option === "string" ? option : option.displayName
         }
-        renderInput={(params) => <TextField {...params} label={label} />}
+        renderInput={(params) => (
+          <TextField variant="standard" {...params} label={label} />
+        )}
         onChange={onSelect}
       />
       <Dialog open={isDialogOpen} onClose={closeDialog}>

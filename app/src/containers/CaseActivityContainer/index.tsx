@@ -11,6 +11,7 @@ export default function CaseActivityContainer(props: {
 }) {
   const { comments, sendComment } = props;
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [inputHeight, setInputHeight] = useState(0);
 
   useEffect(() => {
     const activities: Activity[] = comments.map((comment) => ({
@@ -31,7 +32,10 @@ export default function CaseActivityContainer(props: {
   return (
     <div className={styles.container}>
       <h2>Aktywność</h2>
-      <div className={styles.activityContainer}>
+      <div
+        className={styles.activityContainer}
+        style={{ height: `calc(97vh - 5.6rem - 20px - ${inputHeight}px)` }}
+      >
         {activities.map((activity) => (
           <Card key={activity.uid} className={styles.activityCard}>
             <p>{activity.createdAt.toLocaleString()}</p>
@@ -39,7 +43,7 @@ export default function CaseActivityContainer(props: {
           </Card>
         ))}
       </div>
-      <CommentInput onSend={addComment} />
+      <CommentInput onSend={addComment} onHeightChange={setInputHeight} />
     </div>
   );
 }

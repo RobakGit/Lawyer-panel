@@ -7,13 +7,6 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
-.filesGridContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 3rem;
-  padding: 1rem;
-}
-
 .uploadPrompt {
   display: flex;
   justify-content: center;

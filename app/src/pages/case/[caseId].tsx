@@ -2,7 +2,7 @@ import TextEditor from "@/components/TextEditor";
 import CaseHeaderPanel from "@/components/panels/CaseHeaderPanel";
 import FilesPanelWithUploader from "@/components/panels/FilesPanelWithUploader";
 import CaseActivityContainer from "@/containers/CaseActivityContainer";
-import { Grid } from "@mui/material";
+import { Grid2 as Grid } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import DOMPurify from "isomorphic-dompurify";
 import axios from "axios";
@@ -15,6 +15,7 @@ export default function CaseContainer() {
   const [description, setDescription] = useState<string | null>("");
   const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
   const [files, setFiles] = useState<FileType[]>([]);
+  const [directory, setDirectory] = useState<FileType | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const caseId = useRef<string>("");
 
@@ -29,7 +30,7 @@ export default function CaseContainer() {
       setDescription(response.data.description);
     });
 
-    axios.get("/api/users").then((response) => {
+    axios.get("/api/user").then((response) => {
       setAllUsers(response.data);
     });
   }, [router]);
@@ -63,6 +64,9 @@ export default function CaseContainer() {
     const formData = new FormData();
     uploadedFiles.forEach((file) => {
       formData.append("files", file);
+      if (directory) {
+        formData.append("parentUid", directory.uid);
+      }
     });
     axios
       .post(`/api/case/${caseId.current}/file`, formData, {
@@ -70,6 +74,20 @@ export default function CaseContainer() {
           "Content-Type": "multipart/form-data",
         },
       })
+      .then((response) => {
+        const filesData = response.data.filesData;
+        setFiles((prevFiles) => [...prevFiles, ...filesData]);
+      });
+  };
+
+  const createDirectory = async () => {
+    const formData = new FormData();
+    formData.append("directory", "Nowy Folder");
+    if (directory) {
+      formData.append("parentUid", directory.uid);
+    }
+    axios
+      .post(`/api/case/${caseId.current}/file`, formData)
       .then((response) => {
         const filesData = response.data.filesData;
         setFiles((prevFiles) => [...prevFiles, ...filesData]);
@@ -97,18 +115,56 @@ export default function CaseContainer() {
     }
   };
 
+  const changeParent = async (fileUid: string, newParentUid: string) => {
+    const response = await axios.put(
+      `/api/case/${caseId.current}/file/${fileUid}`,
+      {
+        parentUid: newParentUid,
+      }
+    );
+    if (response.status === 200) {
+      setFiles((prevFiles) => prevFiles.filter((file) => file.uid !== fileUid));
+    }
+  };
+
+  const openDirectory = async (uid: string | null) => {
+    if (!uid) {
+      const actualCaseId = router.query.caseId;
+      const response = await axios.get(`/api/case/${actualCaseId}`);
+      if (response.status === 200) {
+        setFiles(response.data.files);
+        setDirectory(null);
+      }
+      return;
+    }
+    const response = await axios.get(`/api/case/${caseId.current}/file/${uid}`);
+    if (response.status === 200) {
+      setFiles(response.data.files);
+      setDirectory(response.data.parent);
+    }
+  };
+
+  const changeFileName = async (uid: string, newName: string) => {
+    console.log("changeName", uid, newName);
+    const response = await axios.put(
+      `/api/case/${caseId.current}/file/${uid}`,
+      {
+        filename: newName,
+      }
+    );
+    if (response.status === 200) {
+      setFiles((prevFiles) =>
+        prevFiles.map((file) =>
+          file.uid === uid ? { ...file, name: newName } : file
+        )
+      );
+    }
+  };
+
   return (
-    <Grid container>
-      <Grid
-        item
-        container
-        xs={8}
-        direction={"column"}
-        gap={2}
-        // maxHeight={"100vh"}
-        // overflow={"auto"}
-      >
-        <Grid item>
+    <Grid container minHeight="calc(97vh - 2rem)">
+      <Grid container size={{ xs: 8 }} direction={"column"} gap={2}>
+        <Grid>
           {caseData && (
             <CaseHeaderPanel
               title={caseData.title}
@@ -126,14 +182,15 @@ export default function CaseContainer() {
         </Grid>
         <Grid
           onDoubleClick={() => setIsDescriptionEditing(true)}
-          item
           p={1}
           textAlign={"justify"}
           fontSize={20}
           lineHeight={1.5}
+          minHeight={200}
         >
           {isDescriptionEditing ? (
             <TextEditor
+              style={{ minHeight: 200 }}
               content={description ?? ""}
               save={(content) => saveDescription(content)}
             />
@@ -150,16 +207,22 @@ export default function CaseContainer() {
             "Brak opisu... Kliknij dwukrotnie, aby dodać."
           )}
         </Grid>
-        <Grid item>
+        <Grid marginTop={"auto"}>
           <FilesPanelWithUploader
             files={files}
+            directory={directory}
             uploadFiles={uploadFiles}
             onDownload={downloadFile}
             onDelete={deleteFile}
+            onNewDirectory={createDirectory}
+            onChangeParent={changeParent}
+            onOpenDirectory={openDirectory}
+            onFileView={downloadFile}
+            onChangeName={changeFileName}
           />
         </Grid>
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={{ xs: 4 }}>
         <CaseActivityContainer
           comments={caseData?.comments ?? []}
           sendComment={sendComment}

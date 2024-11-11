@@ -1,4 +1,4 @@
-import { CaseStatus, FileStatus } from "@prisma/client";
+import { CaseStatus, FileStatus, Prisma } from "@prisma/client";
 
 export type UserType = {
   uid: string;
@@ -31,6 +31,10 @@ export type Comment = {
 export type File = {
   uid: string;
   name: string;
+  isDirectory: boolean;
+  directory?: {
+    uid?: string;
+  };
 };
 
 export type CaseBackendType = {
@@ -90,12 +94,25 @@ export const CaseBackendPrismaSelect = {
     },
   },
   files: {
-    where: { status: FileStatus.active },
+    where: { status: FileStatus.active, parentDirectory: null },
     select: {
       uid: true,
       name: true,
+      isDirectory: true,
     },
   },
 };
+
+export const CaseBackendPrismaSelectWithFilesOrderBy: Prisma.CaseSelect = {
+  ...CaseBackendPrismaSelect,
+  files: {
+    ...CaseBackendPrismaSelect.files,
+    orderBy: [{ isDirectory: "asc" }, { name: "asc" }],
+  },
+};
+
+export type CaseBackendPrismaResult = Prisma.CaseGetPayload<{
+  select: typeof CaseBackendPrismaSelect;
+}>;
 
 export type CaseDetailsType = CaseBackendType & {};

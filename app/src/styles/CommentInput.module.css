@@ -12,11 +12,11 @@
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 0.5rem 0 0 0.5rem;
-  position: absolute;
+  position: relative;
   max-height: 30vh;
   min-height: 28px;
   overflow: auto;
-  top: 0px;
+  bottom: 0px;
   background-color: #eee;
 }
 
@@ -38,5 +38,5 @@
   cursor: pointer;
   position: absolute !important;
   right: 0;
-  top: 0;
+  bottom: 0;
 }
