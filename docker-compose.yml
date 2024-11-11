@@ -17,6 +17,8 @@ services:
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - FILE_UPLOAD_PATH=${FILE_UPLOAD_PATH}
+      - IS_DEMO_ENABLED=${IS_DEMO_ENABLED}
+      - DEMO_EMAIL=${DEMO_EMAIL}
     volumes:
       - ${EXT_FILE_UPLOAD_PATH}:/app/files
     networks:

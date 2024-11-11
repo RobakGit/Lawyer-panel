@@ -14,6 +14,7 @@ export default function KanbanCard({
   opponent,
   cooperators,
   status,
+  onUserClick,
 }: CardState) {
   const { setNodeRef, attributes, listeners, transform, transition } =
     useSortable({
@@ -58,7 +59,7 @@ export default function KanbanCard({
         client={client}
         opponent={opponent}
         cooperators={cooperators}
-        onUserClick={() => {}}
+        onUserClick={onUserClick}
       />
     </Grid>
   );

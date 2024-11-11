@@ -8,36 +8,6 @@ import SelectMenuList from "@/components/inputs/SelectMenuList";
 import { DeleteForever, DriveFileRenameOutline } from "@mui/icons-material";
 import ChangeNameDialog from "./ChangeNameDialog";
 
-const selectMenuList = [
-  {
-    element: { text: "Podejrzyj", icon: <VisibilityIcon fontSize="small" /> },
-    actionName: "view",
-  },
-  {
-    element: { text: "Pobierz", icon: <DownloadIcon fontSize="small" /> },
-    actionName: "download",
-  },
-  {
-    element: {
-      text: "Zmień nazwę",
-      icon: <DriveFileRenameOutline fontSize="small" />,
-    },
-    actionName: "rename",
-  },
-  {
-    element: {
-      text: "Usuń",
-      icon: <DeleteForever fontSize="small" />,
-      sx: {
-        background: "#ff00003f",
-        marginTop: "1rem",
-        "&:hover": { background: "#ff0000af" },
-      },
-    },
-    actionName: "delete",
-  },
-];
-
 const filenameLimit = 30;
 
 export default function FileCard(
@@ -66,6 +36,43 @@ export default function FileCard(
   const [moreIconRef, setMoreIconRef] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(moreIconRef);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+
+  const selectMenuList = [
+    {
+      element: { text: "Podejrzyj", icon: <VisibilityIcon fontSize="small" /> },
+      actionName: "view",
+    },
+    ...(!isDirectory
+      ? [
+          {
+            element: {
+              text: "Pobierz",
+              icon: <DownloadIcon fontSize="small" />,
+            },
+            actionName: "download",
+          },
+        ]
+      : []),
+    {
+      element: {
+        text: "Zmień nazwę",
+        icon: <DriveFileRenameOutline fontSize="small" />,
+      },
+      actionName: "rename",
+    },
+    {
+      element: {
+        text: "Usuń",
+        icon: <DeleteForever fontSize="small" />,
+        sx: {
+          background: "#ff00003f",
+          marginTop: "1rem",
+          "&:hover": { background: "#ff0000af" },
+        },
+      },
+      actionName: "delete",
+    },
+  ];
 
   const iconsWithAlt = {
     returnDir: { icon: "/exit-folder-icon.svg", alt: "exit folder" },

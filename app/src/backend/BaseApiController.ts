@@ -1,5 +1,4 @@
-import Nextauth from "@/pages/api/auth/[...nextauth]";
-import { ServerSessionI } from "@/types/next-auth";
+import { createAuthOptions } from "@/pages/api/auth/[...nextauth]";
 import { StatusCodes } from "http-status-codes";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession, Session } from "next-auth";
@@ -14,10 +13,19 @@ export default abstract class BaseApiController {
   }
 
   protected async getSession() {
-    return getServerSession<ServerSessionI>(this.req, this.res, Nextauth);
+    const authOptions = createAuthOptions(this.req, this.res);
+    return getServerSession(this.req, this.res, authOptions);
   }
 
   async process() {
+    const session = await this.getSession();
+    if (session?.user?.email === process.env.DEMO_EMAIL) {
+      if (this.req.method !== "GET") {
+        return this.responseUnauthorized({
+          message: "Demo user has no access to queries other than GET method.",
+        });
+      }
+    }
     switch (this.req.method) {
       case "POST":
         await this.post();
